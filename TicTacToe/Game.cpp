@@ -13,4 +13,7 @@ Game::Game(int id, Player *p1, Player *p2)
     this->id = id;
     this->p1 = p1;
     this->p2 = p2;
+    
+    p1->game_id = id;
+    p2->game_id = id;
 }

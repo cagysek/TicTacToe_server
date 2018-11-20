@@ -22,17 +22,29 @@ using namespace std;
 class GameManager
 {
     public:
-        static void create_unlogged_player(char *ip, int client_socket);
         static Player* get_logged_player_by_socket(int socked_id);
-        void log_player(int client_socket, string name);
+    
         static Player* get_unlogged_player(int id);
+    
+        static void create_unlogged_player(char *ip, int client_socket);
+        static void want_play(Player *pl);
+    
+    
         Player* get_logged_player(string name);
-        static stack<Player*> players_queue;
+        void log_player(int client_socket, string name);
+
     
     private:
         static map<int, Player*> unlogged_players;
         static map<string, Player*> logged_players;
-        map<int, Game*> running_games;
+    
+        static map<int, Game*> running_games;
+        static stack<Player*> players_queue;
+    
+        static void create_game(Player* pl1, Player* pl2);
+        static Player* find_opponent();
+    
+        static int game_id_generator;
 };
 
 

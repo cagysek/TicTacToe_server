@@ -21,6 +21,7 @@ class Player
         int socket;
         char *message_in;
         std::string name;
+        int game_id;
     
         Player(char *ip, int socket);
     

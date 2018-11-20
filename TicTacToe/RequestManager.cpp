@@ -31,6 +31,6 @@ void RequestManager::resolve(Player *pl, std::string msg)
     }
     else if ( strcmp(type.c_str(), "FIND_GAME") == 0 )
     {
-        GameManager::players_queue.push(pl);
+        GameManager::want_play(pl);
     }
 }

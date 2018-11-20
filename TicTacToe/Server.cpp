@@ -132,11 +132,13 @@ void Server::listenConnections()
                         
                         recv(pl->socket , &cbuf , 1024 , 0);
 
-                        std::string msg(cbuf);
+                        string msg(cbuf);
+                        
+                        cout << "Recv from " << pl->name << " zprava: " << msg.data() << endl;
                         
                         RequestManager::resolve(pl, msg);
                         
-                        std::cout << "Recv from " << pl->name << " zprava: " << msg.data() << "\n";
+                        
                         
                         send(pl->socket, msg.data(), msg.length(), 0);
                         
