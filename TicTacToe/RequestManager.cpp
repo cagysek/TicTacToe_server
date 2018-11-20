@@ -27,10 +27,14 @@ void RequestManager::resolve(Player *pl, std::string msg)
         i = msg.find(delimeter, 0);
         string name = msg.substr(0, i);
         pl->set_name(name.data());
-        cout << "Hrac se socketem " << pl->socket << " nastaveno jmeno na " << pl->name << "\n";
+        cout << "Player with socket: " << pl->socket << " renamed to " << pl->name << endl;
     }
     else if ( strcmp(type.c_str(), "FIND_GAME") == 0 )
     {
         GameManager::want_play(pl);
+    }
+    else
+    {
+        cout << "Action " << type << "is not defined";
     }
 }

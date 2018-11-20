@@ -31,13 +31,14 @@ void GameManager::log_player(int client_socket, string name)
 
 void GameManager::create_unlogged_player(char *ip, int client_socket)
 {
+    cout << "Connected new player with IP: " << ip << " on socket: " << client_socket << ".";
+    
     Player *pl = new Player(ip, client_socket);
     
     //add new connected player
     GameManager::unlogged_players.insert(make_pair(client_socket, pl));
     
-    printf("Pripojen novy klient s Ip: ");
-    std::cout << pl->ip << " socket: " << pl->socket << endl;
+    cout << " and was added into unlogged players." << endl;
 }
 
 

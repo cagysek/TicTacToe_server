@@ -12,6 +12,7 @@ Player::Player(char *ip, int socket)
 {
     this->ip = ip;
     this->socket = socket;
+    this->name = "UnKnow";
 }
 
 void set_name(Player *pl, std::string name)

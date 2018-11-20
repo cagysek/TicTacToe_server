@@ -134,7 +134,7 @@ void Server::listenConnections()
 
                         string msg(cbuf);
                         
-                        cout << "Recv from " << pl->name << " zprava: " << msg.data() << endl;
+                        cout << "Recv from " << pl->name << " message: " << msg.data() << endl;
                         
                         RequestManager::resolve(pl, msg);
                         
