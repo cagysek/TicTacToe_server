@@ -7,9 +7,17 @@
 //
 
 #include <iostream>
+#include "Server.hpp"
+#include "Network.hpp"
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+int main(int argc, const char * argv[])
+{
+    puts("Starting server!");
+    
+    Server *server = new Server();
+    server->setUp();
+    
+    server->listenConnections();
+    
     return 0;
 }

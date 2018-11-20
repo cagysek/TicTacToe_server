@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		160F18462199F7E60044DCC5 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160F18452199F7E60044DCC5 /* main.cpp */; };
+		160F18512199F9240044DCC5 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160F184F2199F9240044DCC5 /* Player.cpp */; };
+		160F18542199F9340044DCC5 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160F18522199F9340044DCC5 /* Game.cpp */; };
+		160F18572199FFEB0044DCC5 /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160F18552199FFEB0044DCC5 /* Server.cpp */; };
+		16252F2721A2D88D00C62062 /* RequestManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16252F2521A2D88D00C62062 /* RequestManager.cpp */; };
+		16252F2A21A2EB3300C62062 /* GameManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16252F2821A2EB3300C62062 /* GameManager.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +30,16 @@
 /* Begin PBXFileReference section */
 		160F18422199F7E60044DCC5 /* TicTacToe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TicTacToe; sourceTree = BUILT_PRODUCTS_DIR; };
 		160F18452199F7E60044DCC5 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		160F184F2199F9240044DCC5 /* Player.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = "<group>"; };
+		160F18502199F9240044DCC5 /* Player.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Player.hpp; sourceTree = "<group>"; };
+		160F18522199F9340044DCC5 /* Game.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Game.cpp; sourceTree = "<group>"; };
+		160F18532199F9340044DCC5 /* Game.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Game.hpp; sourceTree = "<group>"; };
+		160F18552199FFEB0044DCC5 /* Server.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cpp; sourceTree = "<group>"; };
+		160F18562199FFEB0044DCC5 /* Server.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Server.hpp; sourceTree = "<group>"; };
+		16252F2521A2D88D00C62062 /* RequestManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RequestManager.cpp; sourceTree = "<group>"; };
+		16252F2621A2D88D00C62062 /* RequestManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RequestManager.hpp; sourceTree = "<group>"; };
+		16252F2821A2EB3300C62062 /* GameManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameManager.cpp; sourceTree = "<group>"; };
+		16252F2921A2EB3300C62062 /* GameManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GameManager.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +73,16 @@
 			isa = PBXGroup;
 			children = (
 				160F18452199F7E60044DCC5 /* main.cpp */,
+				160F184F2199F9240044DCC5 /* Player.cpp */,
+				160F18502199F9240044DCC5 /* Player.hpp */,
+				160F18522199F9340044DCC5 /* Game.cpp */,
+				160F18532199F9340044DCC5 /* Game.hpp */,
+				160F18552199FFEB0044DCC5 /* Server.cpp */,
+				160F18562199FFEB0044DCC5 /* Server.hpp */,
+				16252F2521A2D88D00C62062 /* RequestManager.cpp */,
+				16252F2621A2D88D00C62062 /* RequestManager.hpp */,
+				16252F2821A2EB3300C62062 /* GameManager.cpp */,
+				16252F2921A2EB3300C62062 /* GameManager.hpp */,
 			);
 			path = TicTacToe;
 			sourceTree = "<group>";
@@ -119,6 +144,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				160F18462199F7E60044DCC5 /* main.cpp in Sources */,
+				16252F2A21A2EB3300C62062 /* GameManager.cpp in Sources */,
+				160F18572199FFEB0044DCC5 /* Server.cpp in Sources */,
+				160F18512199F9240044DCC5 /* Player.cpp in Sources */,
+				160F18542199F9340044DCC5 /* Game.cpp in Sources */,
+				16252F2721A2D88D00C62062 /* RequestManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,6 +270,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -248,6 +279,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
