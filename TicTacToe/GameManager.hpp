@@ -16,6 +16,7 @@
 
 #include "Player.hpp"
 #include "Game.hpp"
+#include "GameLogic.hpp"
 
 using namespace std;
 
@@ -28,11 +29,12 @@ class GameManager
     
         static void create_unlogged_player(char *ip, int client_socket);
         static void want_play(Player *pl);
-    
+        static void turn(Player *pl, int row, int column);
     
         Player* get_logged_player(string name);
         void log_player(int client_socket, string name);
 
+    static Game* get_running_game(int id);
     
     private:
         static map<int, Player*> unlogged_players;
@@ -45,6 +47,7 @@ class GameManager
         static Player* find_opponent();
     
         static int game_id_generator;
+        static void resolve_result(Player* pl, int result);
 };
 
 

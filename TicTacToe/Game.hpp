@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "Player.hpp"
+#include "GameLogic.hpp"
 
 
 class Game
@@ -19,8 +20,13 @@ class Game
         Player *p1;
         Player *p2;
         int id;
+        GameLogic *gameLogic;
+    
     
         Game(int id, Player *p1, Player *p2);
+        Player* get_opponent(Player* pl);
+        Player* get_player_1()          {return p1; };
+        Player* get_player_2()          {return p2; };
     
 };
 

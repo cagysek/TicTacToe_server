@@ -33,6 +33,23 @@ void RequestManager::resolve(Player *pl, std::string msg)
     {
         GameManager::want_play(pl);
     }
+    else if ( strcmp(type.c_str(), "TURN") == 0 )
+    {
+        try {
+            i = msg.find(delimeter, 0);
+            int row = stoi(msg.substr(0, i));
+            
+            msg = msg.substr(i + 1);
+            i = msg.find(delimeter, 0);
+            int column = stoi(msg.substr(0, i));
+            
+            cout << "Player " << pl->name << " move is row: " << row << " column: " << column << endl;
+            GameManager::turn(pl, row, column);
+        } catch (...) {
+            cout << "Invalid input." << endl;
+        }
+        
+    }
     else
     {
         cout << "Action " << type << "is not defined";

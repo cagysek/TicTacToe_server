@@ -25,7 +25,7 @@ void GameManager::log_player(int client_socket, string name)
     
     GameManager::logged_players.insert(make_pair(name, pl));
     
-    printf("New player is registered. Socket ID: %d, Player name: %s", pl->socket, pl->name.c_str());
+    printf("New player is registered. Socket ID: %d, Player name: %s and was moved from unlogged to logged players", pl->socket, pl->name.c_str());
 }
 
 
@@ -55,7 +55,7 @@ Player* GameManager::get_unlogged_player(int id)
 
 Player* GameManager::get_logged_player_by_socket(int id)
 {
-    std::map<string, Player*>::iterator it = GameManager::logged_players.begin();
+    map<string, Player*>::iterator it = GameManager::logged_players.begin();
     while (it != GameManager::logged_players.end())
     {
         Player *pl = it->second;
@@ -65,7 +65,6 @@ Player* GameManager::get_logged_player_by_socket(int id)
             return pl;
         }
         
-        // Increment the Iterator to point to next entry
         it++;
     }
     
@@ -115,5 +114,56 @@ void GameManager::create_game(Player* pl1, Player *pl2)
     cout << "New game with ID: " << game->id << " created." << endl;
 }
 
+
+void GameManager::turn(Player* pl, int row, int column)
+{
+    Game* game = get_running_game(pl->game_id);
+    GameLogic* game_logic = game->gameLogic;
+    
+    game_logic->turn(row, column, pl);
+    
+    int result = game_logic->check_board();
+    
+    if ( result == 0 )
+    {
+        Player* new_player_on_turn = game->get_opponent(pl);
+        game_logic->turn_indicator = new_player_on_turn->socket;
+    }
+    else
+    {
+        resolve_result(pl, result);
+    }
+    
+}
+
+void GameManager::resolve_result(Player *pl, int result)
+{
+    if (result == -1)
+    {
+        printf("Tie");
+    }
+    else
+    {
+        cout << "Player " << pl->name << " is WINNER";
+    }
+}
+
+Game* GameManager::get_running_game(int id)
+{
+    map<int, Game*>::iterator it = running_games.begin();
+    while (it != running_games.end())
+    {
+        Game *game = it->second;
+        
+        if (game->id == id)
+        {
+            return game;
+        }
+        
+        it++;
+    }
+    
+    return NULL;
+}
 
 

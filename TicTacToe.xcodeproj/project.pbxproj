@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1604003B21A4ABE9009DEA8E /* GameLogic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1604003921A4ABE9009DEA8E /* GameLogic.cpp */; };
 		160F18462199F7E60044DCC5 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160F18452199F7E60044DCC5 /* main.cpp */; };
 		160F18512199F9240044DCC5 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160F184F2199F9240044DCC5 /* Player.cpp */; };
 		160F18542199F9340044DCC5 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160F18522199F9340044DCC5 /* Game.cpp */; };
@@ -28,6 +29,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1604003921A4ABE9009DEA8E /* GameLogic.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameLogic.cpp; sourceTree = "<group>"; };
+		1604003A21A4ABE9009DEA8E /* GameLogic.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GameLogic.hpp; sourceTree = "<group>"; };
 		160F18422199F7E60044DCC5 /* TicTacToe */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TicTacToe; sourceTree = BUILT_PRODUCTS_DIR; };
 		160F18452199F7E60044DCC5 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		160F184F2199F9240044DCC5 /* Player.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = "<group>"; };
@@ -83,6 +86,8 @@
 				16252F2621A2D88D00C62062 /* RequestManager.hpp */,
 				16252F2821A2EB3300C62062 /* GameManager.cpp */,
 				16252F2921A2EB3300C62062 /* GameManager.hpp */,
+				1604003921A4ABE9009DEA8E /* GameLogic.cpp */,
+				1604003A21A4ABE9009DEA8E /* GameLogic.hpp */,
 			);
 			path = TicTacToe;
 			sourceTree = "<group>";
@@ -146,6 +151,7 @@
 				160F18462199F7E60044DCC5 /* main.cpp in Sources */,
 				16252F2A21A2EB3300C62062 /* GameManager.cpp in Sources */,
 				160F18572199FFEB0044DCC5 /* Server.cpp in Sources */,
+				1604003B21A4ABE9009DEA8E /* GameLogic.cpp in Sources */,
 				160F18512199F9240044DCC5 /* Player.cpp in Sources */,
 				160F18542199F9340044DCC5 /* Game.cpp in Sources */,
 				16252F2721A2D88D00C62062 /* RequestManager.cpp in Sources */,
