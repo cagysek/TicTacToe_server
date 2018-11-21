@@ -13,6 +13,7 @@ Player::Player(char *ip, int socket)
     this->ip = ip;
     this->socket = socket;
     this->name = "UnKnow";
+    this->want_rematch = false;
 }
 
 void set_name(Player *pl, std::string name)

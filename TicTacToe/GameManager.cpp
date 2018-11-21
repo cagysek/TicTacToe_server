@@ -120,18 +120,27 @@ void GameManager::turn(Player* pl, int row, int column)
     Game* game = get_running_game(pl->game_id);
     GameLogic* game_logic = game->gameLogic;
     
-    game_logic->turn(row, column, pl);
+    int status = game_logic->turn(row, column, pl);
     
-    int result = game_logic->check_board();
-    
-    if ( result == 0 )
+    if (status == 0)
     {
-        Player* new_player_on_turn = game->get_opponent(pl);
-        game_logic->turn_indicator = new_player_on_turn->socket;
-    }
-    else
-    {
-        resolve_result(pl, result);
+        int result = game_logic->check_board();
+        
+        if ( result == 0 )
+        {
+            Player* new_player_on_turn = game->get_opponent(pl);
+            game_logic->turn_indicator = new_player_on_turn->socket;
+        }
+        else if (result == -1)
+        {
+            printf("Tie");
+        }
+        else
+        {
+            cout << "Player " << pl->name << " is WINNER";
+            game_logic->last_winner = pl;
+            //resolve_result(pl, result);
+        }
     }
     
 }
@@ -166,4 +175,21 @@ Game* GameManager::get_running_game(int id)
     return NULL;
 }
 
+void GameManager::rematch(Player *pl)
+{
+    cout << "Player " << pl->name << " wants rematch." << endl;
+    pl->want_rematch = true;
+    Game* game = get_running_game(pl->game_id);
+    
+    if ( game->get_player_1()->want_rematch && game->get_player_2()->want_rematch)
+    {
+        cout << "Both players want rematch. Cleaning old board..." << endl;
+        GameLogic* game_logic = game->gameLogic;
+        game_logic->reset_board();
+        
+        //starts player which lose
+        game_logic->turn_indicator = game->get_opponent(game_logic->last_winner)->socket;
+    }
+    
+}
 

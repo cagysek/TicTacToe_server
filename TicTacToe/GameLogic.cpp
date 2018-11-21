@@ -29,6 +29,17 @@ int** GameLogic::initialize_board()
     return new_board;
 }
 
+void GameLogic::reset_board()
+{
+    for ( int i = 0 ; i < SIZE ; i++ )
+    {
+        for ( int j = 0 ; j < SIZE ; j++ )
+        {
+            board[i][j] = 0;
+        }
+    }
+}
+
 
 int GameLogic::turn(int row, int column, Player* pl)
 {
@@ -45,8 +56,7 @@ int GameLogic::turn(int row, int column, Player* pl)
         else
         {
             cout << "Invalid move. Row: " << row << " Column: " << column << " is already marked." << endl;
-            turn(row, column, pl);
-            return 0;
+            return 1;
         }
     }
     else

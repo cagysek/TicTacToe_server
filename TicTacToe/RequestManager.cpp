@@ -48,7 +48,10 @@ void RequestManager::resolve(Player *pl, std::string msg)
         } catch (...) {
             cout << "Invalid input." << endl;
         }
-        
+    }
+    else if ( strcmp(type.c_str(), "REMATCH") == 0 )
+    {
+        GameManager::rematch(pl);
     }
     else
     {

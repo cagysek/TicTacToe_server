@@ -26,8 +26,10 @@ class GameLogic
     
         int turn(int row, int column, Player* pl);
     
-    
+    void reset_board();
         int check_board();
+    
+    Player* last_winner;
     
     private:
         int** board;

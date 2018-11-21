@@ -35,6 +35,7 @@ class GameManager
         void log_player(int client_socket, string name);
 
     static Game* get_running_game(int id);
+    static void rematch(Player* pl);
     
     private:
         static map<int, Player*> unlogged_players;

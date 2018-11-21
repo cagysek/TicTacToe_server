@@ -23,6 +23,8 @@ class Player
         std::string name;
         int game_id;
     
+    bool want_rematch;
+    
         Player(char *ip, int socket);
     
         void set_name(string new_name)     {name = new_name; };
