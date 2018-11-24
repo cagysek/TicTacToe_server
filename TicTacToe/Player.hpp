@@ -20,7 +20,7 @@ class Player
         char *ip;
         int socket;
         char *message_in;
-        std::string name;
+        string name;
         int game_id;
     
     bool want_rematch;

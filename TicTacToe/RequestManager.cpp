@@ -55,6 +55,6 @@ void RequestManager::resolve(Player *pl, std::string msg)
     }
     else
     {
-        cout << "Action " << type << "is not defined";
+        cout << "Action " << type << " is not defined";
     }
 }

@@ -17,6 +17,7 @@
 #include "Player.hpp"
 #include "Game.hpp"
 #include "GameLogic.hpp"
+#include "ResponseManager.hpp"
 
 using namespace std;
 

@@ -14,6 +14,7 @@
 		160F18572199FFEB0044DCC5 /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160F18552199FFEB0044DCC5 /* Server.cpp */; };
 		16252F2721A2D88D00C62062 /* RequestManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16252F2521A2D88D00C62062 /* RequestManager.cpp */; };
 		16252F2A21A2EB3300C62062 /* GameManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16252F2821A2EB3300C62062 /* GameManager.cpp */; };
+		16DCAE4C21A75D0C0022196F /* ResponseManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DCAE4A21A75D0C0022196F /* ResponseManager.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,6 +44,8 @@
 		16252F2621A2D88D00C62062 /* RequestManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RequestManager.hpp; sourceTree = "<group>"; };
 		16252F2821A2EB3300C62062 /* GameManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GameManager.cpp; sourceTree = "<group>"; };
 		16252F2921A2EB3300C62062 /* GameManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = GameManager.hpp; sourceTree = "<group>"; };
+		16DCAE4A21A75D0C0022196F /* ResponseManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ResponseManager.cpp; sourceTree = "<group>"; };
+		16DCAE4B21A75D0C0022196F /* ResponseManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ResponseManager.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +91,8 @@
 				16252F2921A2EB3300C62062 /* GameManager.hpp */,
 				1604003921A4ABE9009DEA8E /* GameLogic.cpp */,
 				1604003A21A4ABE9009DEA8E /* GameLogic.hpp */,
+				16DCAE4A21A75D0C0022196F /* ResponseManager.cpp */,
+				16DCAE4B21A75D0C0022196F /* ResponseManager.hpp */,
 			);
 			path = TicTacToe;
 			sourceTree = "<group>";
@@ -154,6 +159,7 @@
 				1604003B21A4ABE9009DEA8E /* GameLogic.cpp in Sources */,
 				160F18512199F9240044DCC5 /* Player.cpp in Sources */,
 				160F18542199F9340044DCC5 /* Game.cpp in Sources */,
+				16DCAE4C21A75D0C0022196F /* ResponseManager.cpp in Sources */,
 				16252F2721A2D88D00C62062 /* RequestManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

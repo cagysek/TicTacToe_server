@@ -80,11 +80,18 @@ void GameManager::want_play(Player* pl)
     {
         cout << "Opponent not found. Player: " << pl->name << " added to queue" << endl;
         players_queue.push(pl);
+        ResponseManager::sendToClient(pl, "WAITING");
+        
     }
     else
     {
+        
+        ResponseManager::sendToClient(pl, "STARTING_GAME");
+        ResponseManager::sendToClient(opponent, "STARTING_GAME");
+        
         cout << "Opponent found with name: " << opponent->name << endl;
         create_game(pl, opponent);
+        
     }
 
 }
@@ -192,4 +199,5 @@ void GameManager::rematch(Player *pl)
     }
     
 }
+
 

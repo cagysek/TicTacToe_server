@@ -138,9 +138,9 @@ void Server::listenConnections()
                         
                         RequestManager::resolve(pl, msg);
                         
+                        msg = msg += "\n";
                         
-                        
-                        send(pl->socket, msg.data(), msg.length(), 0);
+                      //  send(pl->socket, msg.data(), msg.length(), 0);
                         
                         msg.clear();
 
