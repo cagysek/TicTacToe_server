@@ -20,12 +20,20 @@ class Player
         char *ip;
         int socket;
         char *message_in;
-        string name;
         int game_id;
     
-    bool want_rematch;
+        int connected;
+    
+        int score;
+    
+        string name;
+        string msg_in;
+        string msg_out;
+    
+        bool want_rematch;
     
         Player(char *ip, int socket);
+    ~Player();
     
         void set_name(string new_name)     {name = new_name; };
 };

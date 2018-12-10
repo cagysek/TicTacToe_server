@@ -14,9 +14,16 @@ Player::Player(char *ip, int socket)
     this->socket = socket;
     this->name = "UnKnow";
     this->want_rematch = false;
+    this->connected = 0;
+    this->score = 0;
 }
 
 void set_name(Player *pl, std::string name)
 {
     pl->name = name;
+}
+
+Player::~Player()
+{
+    cout << "Player deleted" << endl;
 }

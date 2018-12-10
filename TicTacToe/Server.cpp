@@ -147,6 +147,9 @@ void Server::listenConnections()
                     }
                     else // na socketu se stalo neco spatneho
                     {
+                        
+                        
+                        
                         close(fd);
                         FD_CLR(fd, &client_socks);
                         printf("Klient se odpojil a byl odebran ze sady socketu\n");

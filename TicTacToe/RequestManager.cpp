@@ -12,36 +12,30 @@
 
 void RequestManager::resolve(Player *pl, std::string msg)
 {
-    char delimeter = ';';
-    size_t i = msg.find(delimeter, 0);
-    string type = msg;
+    pl->msg_in = msg;
     
+    vector<string> msg_parts = Utils::split(msg, ";");
+
     //type of message
-    type = msg.substr(0, i);
+    string type = msg_parts[0];
     
-    //rest of message
-    msg = msg.substr(i + 1);
-    
-    if ( strcmp(type.c_str(), "NAME") == 0 )
+    if ( type.compare("NAME") == 0 )
     {
-        i = msg.find(delimeter, 0);
-        string name = msg.substr(0, i);
-        pl->set_name(name.data());
-        cout << "Player with socket: " << pl->socket << " renamed to " << pl->name << endl;
+        string name = msg_parts[1];
+        GameManager::log_player_resolve(pl->socket, name);
+        //GameManager::log_player(pl->socket, name);
+        //pl->set_name(name.data());
     }
-    else if ( strcmp(type.c_str(), "FIND_GAME") == 0 )
+    else if ( type.compare("FIND_GAME") == 0 )
     {
         GameManager::want_play(pl);
     }
-    else if ( strcmp(type.c_str(), "TURN") == 0 )
+    else if ( type.compare("TURN") == 0 )
     {
         try {
-            i = msg.find(delimeter, 0);
-            int row = stoi(msg.substr(0, i));
+            int row = stoi(msg_parts[1]);
             
-            msg = msg.substr(i + 1);
-            i = msg.find(delimeter, 0);
-            int column = stoi(msg.substr(0, i));
+            int column = stoi(msg_parts[2]);
             
             cout << "Player " << pl->name << " move is row: " << row << " column: " << column << endl;
             GameManager::turn(pl, row, column);
@@ -49,9 +43,17 @@ void RequestManager::resolve(Player *pl, std::string msg)
             cout << "Invalid input." << endl;
         }
     }
-    else if ( strcmp(type.c_str(), "REMATCH") == 0 )
+    else if ( type.compare("REMATCH") == 0 )
     {
         GameManager::rematch(pl);
+    }
+    else if ( type.compare("CLOSE_GAME") == 0 )
+    {
+        GameManager::close_game(pl);
+    }
+    else if ( type.compare("EXIT") == 0)
+    {
+        GameManager::exit(pl);
     }
     else
     {

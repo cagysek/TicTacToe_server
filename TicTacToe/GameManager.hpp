@@ -32,11 +32,19 @@ class GameManager
         static void want_play(Player *pl);
         static void turn(Player *pl, int row, int column);
     
-        Player* get_logged_player(string name);
-        void log_player(int client_socket, string name);
+        static Player* get_logged_player_by_name(string name);
+        static void log_player(int client_socket, string name);
 
-    static Game* get_running_game(int id);
-    static void rematch(Player* pl);
+        static Game* get_running_game(int id);
+        static void rematch(Player* pl);
+        static void close_game(Player* pl);
+        static void disconected_player(int pl_socket);
+        static void reconnected_player(Player* pl, int new_socket);
+        static void print_games();
+    
+        static void log_player_resolve(int client_socket, string name);
+        
+        static void exit(Player* pl);
     
     private:
         static map<int, Player*> unlogged_players;

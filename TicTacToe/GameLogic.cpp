@@ -76,8 +76,8 @@ int GameLogic::check_board()
     {
         if ( board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != 0 )
         {
-            winner = board[i][0];
-            return winner;
+            //winner = board[i][0];
+            return 1;
         }
     }
     
@@ -86,34 +86,34 @@ int GameLogic::check_board()
     {
         if ( board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != 0 )
         {
-            winner = board[0][i];
-            return winner;
+            //winner = board[0][i];
+            return 1;
         }
     }
     
     // 1st diagonal is same
     if( board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != 0 )
     {
-        winner = board[0][0];
-        return winner;
+        //winner = board[0][0];
+        return 1;
     }
     
     // 2nd diagonal is same
     if( board[0][2] == board[1][1] && board[1][1] == board[2][0] && board [0][2] != 0 )
     {
-        winner = board[0][2];
-        return winner;
+        //winner = board[0][2];
+        return 1;
     }
     
     // if any empty box on board then play on
-    for( int i = 0; i <= SIZE ; i++ )
+    for( int i = 0; i < SIZE ; i++ )
     {
-        for( int j=0 ; j <= SIZE ; j++ )
+        for( int j=0 ; j < SIZE ; j++ )
         {
             if( board[i][j] == 0 )
             {
-                winner = 0;
-                return winner;
+                cout << "i: " << i << " j: " << j << endl;
+                return 0;
             }
         }
     }

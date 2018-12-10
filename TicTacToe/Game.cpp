@@ -30,3 +30,8 @@ Player* Game::get_opponent(Player* pl)
     
     return get_player_1();
 }
+
+Game::~Game()
+{
+    cout << "Room deleted" << endl;
+}

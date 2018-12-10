@@ -18,6 +18,13 @@ class ResponseManager
 {
 public:
     static void sendToClient(Player* pl, string msg);
+    static void sendToSpecificSocket(int socket_id, string msg);
+    static void acceptRequest(Player* pl, string action);
+    static void dennyRequest(Player* pl, string action);
+    static void acceptMove(Player *pl, int row, int column);
+    static void sentMoveToOpponent(Player *pl, int row, int column);
+    static void sendState(Player* pl, string state);
+    static void sendResult(Player* pl, string msg);
 };
 
 

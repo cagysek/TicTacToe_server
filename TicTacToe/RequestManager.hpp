@@ -10,8 +10,10 @@
 #define RequestManager_hpp
 
 #include <stdio.h>
+#include <vector>
 #include "Player.hpp"
 #include "GameManager.hpp"
+#include "Utils.hpp"
 
 class RequestManager
 {
