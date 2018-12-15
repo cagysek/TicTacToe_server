@@ -25,6 +25,7 @@ class Player
         int connected;
     
         int score;
+        int game_indicator;
     
         string name;
         string msg_in;
@@ -33,7 +34,7 @@ class Player
         bool want_rematch;
     
         Player(char *ip, int socket);
-    ~Player();
+        ~Player();
     
         void set_name(string new_name)     {name = new_name; };
 };

@@ -16,6 +16,7 @@ Player::Player(char *ip, int socket)
     this->want_rematch = false;
     this->connected = 0;
     this->score = 0;
+    this->game_indicator = 0;
 }
 
 void set_name(Player *pl, std::string name)

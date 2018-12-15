@@ -25,7 +25,7 @@
 
 #include <iostream>
 
-
+fd_set Server::client_socks, Server::tests;
 struct sockaddr_in Server::peer_addr, Server::client, Server::server;
 
 
@@ -75,7 +75,10 @@ void Server::setUp()
 
 void Server::listenConnections()
 {
-    fd_set client_socks, tests;
+    
+    
+    struct timeval client_timeout;
+    client_timeout.tv_sec = 10;
     
     FD_ZERO(&client_socks);
     FD_SET(server_socket, &client_socks);
@@ -88,8 +91,8 @@ void Server::listenConnections()
         tests = client_socks;
         
         // sada deskriptoru je po kazdem volani select prepsana sadou deskriptoru kde se neco delo
-        return_value = select(FD_SETSIZE, &tests, (fd_set*)NULL, (fd_set*)NULL, (struct timeval *)0);
-         
+        return_value = select(FD_SETSIZE, &tests, (fd_set*)NULL, (fd_set*)NULL, &client_timeout);
+        
         int a2read;
         char cbuf[1024];
         // vynechavame stdin, stdout, stderr
@@ -138,26 +141,44 @@ void Server::listenConnections()
                         
                         RequestManager::resolve(pl, msg);
                         
-                        msg = msg += "\n";
-                        
-                      //  send(pl->socket, msg.data(), msg.length(), 0);
-                        
                         msg.clear();
-
+                        
                     }
+                    else if (a2read == 0)
+                    {
+                        Player *pl = GameManager::get_logged_player_by_socket(fd);
+                        
+                        if (pl != NULL)
+                        {
+                            if (pl->connected != -1)
+                            {
+                                cout << "Player: " << pl->name << " socket ID: " << pl->socket << " is disconnected" << endl;
+                                GameManager::disconected_player(pl->socket);
+                            }
+                        }
+                       
+                        //if someone is disconnected remove socket
+                        closeSocket(fd);
+                        
+                    }
+                   
                     else // na socketu se stalo neco spatneho
                     {
-                        
-                        
-                        
                         close(fd);
                         FD_CLR(fd, &client_socks);
                         printf("Klient se odpojil a byl odebran ze sady socketu\n");
                     }
+                 
                 }
             }
         }
     }
 }
 
+void Server::closeSocket(int socket)
+{
+    cout << "Client exit game and was removed from sockets. Socket ID: " << socket << endl;
+    close(socket);
+    FD_CLR(socket, &client_socks);
+}
 

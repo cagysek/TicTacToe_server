@@ -43,11 +43,17 @@ void GameLogic::reset_board()
 
 int GameLogic::turn(int row, int column, Player* pl)
 {
-    if ( pl->socket == turn_indicator )
+    if (row < 0 || column < 0 || row >= SIZE || column >= SIZE)
+    {
+        cout << "Invalid coordinates. Out of range" << endl;
+        return 1;
+    }
+    
+    if ( pl->game_indicator == turn_indicator )
     {
         if ( board[row][column] == 0 )
         {
-            board[row][column] = pl->socket;
+            board[row][column] = pl->game_indicator;
             cout << "Row: " << row << " Column: " << column << " marked for player: " << pl->name << "." << endl;
             
             turn_indicator = -1;
@@ -122,5 +128,9 @@ int GameLogic::check_board()
     return winner;
 }
 
+int GameLogic::get_value(int row, int column)
+{
+    return board[row][column];
+}
 
 

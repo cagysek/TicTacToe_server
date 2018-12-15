@@ -18,6 +18,7 @@
 #include "Game.hpp"
 #include "GameLogic.hpp"
 #include "ResponseManager.hpp"
+#include "Server.hpp"
 
 using namespace std;
 
@@ -43,8 +44,13 @@ class GameManager
         static void print_games();
     
         static void log_player_resolve(int client_socket, string name);
+    
+        static void player_ping(Player* pl);
         
         static void exit(Player* pl);
+    
+    static void delete_player_from_queue(Player* pl, int n, int curr);
+    static void notifyOpponent(Player* pl, string msg);
     
     private:
         static map<int, Player*> unlogged_players;

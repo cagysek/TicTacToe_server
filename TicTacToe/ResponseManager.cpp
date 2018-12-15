@@ -38,6 +38,12 @@ void ResponseManager::sentMoveToOpponent(Player *pl, int row, int column)
     ResponseManager::sendToClient(pl, temp);
 }
 
+void ResponseManager::sendStatus(Player *pl, string msg)
+{
+    string temp = "STATUS;" + msg;
+    ResponseManager::sendToClient(pl, temp);
+}
+
 void ResponseManager::sendState(Player *pl, string state)
 {
     ResponseManager::sendToClient(pl, state + ";");
@@ -56,4 +62,33 @@ void ResponseManager::sendToSpecificSocket(int socket_id, string msg)
     send(socket_id, msg.data(), msg.length(), 0);
     
     msg.clear();
+}
+
+void ResponseManager::sendGameToClient(Player *pl, Game *game)
+{
+    string msg = "RECONNECT;";
+    for (int i = 0 ; i < game->size ; i++)
+    {
+    
+        for (int j = 0 ; j < game->size ; j++)
+        {
+            int val = game->gameLogic->get_value(i, j);
+            msg += to_string(val);
+            if (j + 1 < game->size)
+            {
+                msg += ",";
+            }
+        }
+
+        if (i + 1 < game->size)
+        {
+            msg += ",";
+        }
+    }
+    
+    msg += ";" + to_string(pl->game_indicator);
+    msg += ";";
+    
+    sendToClient(pl, msg);
+    
 }

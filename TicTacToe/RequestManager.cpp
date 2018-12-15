@@ -23,8 +23,6 @@ void RequestManager::resolve(Player *pl, std::string msg)
     {
         string name = msg_parts[1];
         GameManager::log_player_resolve(pl->socket, name);
-        //GameManager::log_player(pl->socket, name);
-        //pl->set_name(name.data());
     }
     else if ( type.compare("FIND_GAME") == 0 )
     {

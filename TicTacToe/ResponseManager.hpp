@@ -10,6 +10,7 @@
 #define ResponseManager_hpp
 
 #include "Player.hpp"
+#include "Game.hpp"
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -25,6 +26,9 @@ public:
     static void sentMoveToOpponent(Player *pl, int row, int column);
     static void sendState(Player* pl, string state);
     static void sendResult(Player* pl, string msg);
+    static void sendGameToClient(Player* pl, Game* game);
+    
+    static void sendStatus(Player* pl, string msg);
 };
 
 

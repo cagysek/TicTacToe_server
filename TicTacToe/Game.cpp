@@ -15,10 +15,14 @@ Game::Game(int id, Player *p1, Player *p2)
     this->p2 = p2;
     
     p1->game_id = id;
+    p1->game_indicator = 1;
+    
     p2->game_id = id;
+    p2->game_indicator = 2;
+    
     
     this->gameLogic = new GameLogic();
-    this->gameLogic->turn_indicator = p1->socket;
+    this->gameLogic->turn_indicator = p1->game_indicator;
 }
 
 Player* Game::get_opponent(Player* pl)

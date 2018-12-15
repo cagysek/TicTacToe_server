@@ -26,7 +26,7 @@ void GameManager::log_player(int client_socket, string name)
     GameManager::logged_players.insert(make_pair(name, pl));
     
     printf("New player is registered. Socket ID: %d, Player name: %s and was moved from unlogged to logged players \n", pl->socket, pl->name.c_str());
-    ResponseManager::sendToClient(pl, "LOGIN;0");
+    ResponseManager::sendToClient(pl, "LOGIN");
 }
 
 
@@ -35,6 +35,7 @@ void GameManager::create_unlogged_player(char *ip, int client_socket)
     cout << "Connected new player with IP: " << ip << " on socket: " << client_socket << ".";
     
     Player *pl = new Player(ip, client_socket);
+    
     
     //add new connected player
     GameManager::unlogged_players.insert(make_pair(client_socket, pl));
@@ -60,6 +61,7 @@ Player* GameManager::get_logged_player_by_socket(int id)
     while (it != GameManager::logged_players.end())
     {
         Player *pl = it->second;
+        //cout << pl->name << endl;
         
         if (pl->socket == id)
         {
@@ -122,6 +124,12 @@ Player* GameManager::find_opponent()
         Player *pl = players_queue.top();
         players_queue.pop();
         
+        //check if player is disconnected
+        if (pl->connected == -1)
+        {
+            return NULL;
+        }
+        
         return pl;
     }
     
@@ -138,6 +146,9 @@ void GameManager::create_game(Player* pl1, Player *pl2)
     GameManager::game_id_generator += 1;
     
     cout << "New game with ID: " << game->id << " created." << endl;
+    
+    ResponseManager::sendStatus(pl1, "Your are on Turn;");
+    ResponseManager::sendStatus(pl2, "Opponent is on Turn;");
 }
 
 
@@ -152,8 +163,10 @@ void GameManager::turn(Player* pl, int row, int column)
     {
         
         Player* new_player_on_turn = game->get_opponent(pl);
-        game_logic->turn_indicator = new_player_on_turn->socket;
+        game_logic->turn_indicator = new_player_on_turn->game_indicator;
         
+        ResponseManager::sendStatus(game->get_opponent(pl), "Your are on Turn;");
+        ResponseManager::sendStatus(pl, "Opponent is on Turn;");
         
         ResponseManager::acceptMove(pl, row, column);
         ResponseManager::sentMoveToOpponent(game->get_opponent(pl), row, column);
@@ -221,7 +234,7 @@ void GameManager::rematch(Player *pl)
         game_logic->reset_board();
         
         //starts player which lose
-        game_logic->turn_indicator = game->get_opponent(game_logic->last_winner)->socket;
+        game_logic->turn_indicator = game->get_opponent(game_logic->last_winner)->game_indicator;
         
         ResponseManager::sendState(pl, "STARTING_GAME;0;");
         ResponseManager::sendState(game->get_opponent(pl), "STARTING_GAME;0;");
@@ -242,9 +255,11 @@ void GameManager::close_game(Player *pl)
     
     pl->game_id = 0;
     pl->score = 0;
+    pl->game_indicator = 0;
     
     game->get_opponent(pl)->game_id = 0;
     game->get_opponent(pl)->score = 0;
+    game->get_opponent(pl)->game_indicator = 0;
     
     ResponseManager::sendResult(pl, "CLOSE_GAME;0");
     ResponseManager::sendResult(game->get_opponent(pl), "CLOSE_GAME;0");
@@ -256,14 +271,41 @@ void GameManager::close_game(Player *pl)
 void GameManager::disconected_player(int pl_socket)
 {
     Player* pl = get_logged_player_by_socket(pl_socket);
+    
+    notifyOpponent(pl, "Opponent is disconnected");
+    
     pl->connected = -1;
     pl->socket = -1;
+}
+
+void GameManager::notifyOpponent(Player *pl, string msg)
+{
+    auto game = get_running_game(pl->game_id);
+    
+    auto opponent = game->get_opponent(pl);
+    
+    ResponseManager::sendStatus(opponent, msg);
+    
 }
 
 void GameManager::reconnected_player(Player *pl, int new_socket)
 {
     pl->connected = 0;
     pl->socket = new_socket;
+    
+    
+    auto game = get_running_game(pl->game_id);
+    
+    if (game->gameLogic->turn_indicator == pl->game_indicator)
+    {
+        ResponseManager::sendStatus(pl, "You are on Turn");
+        notifyOpponent(pl, "Opponent is on Turn");
+    }
+    else
+    {
+        ResponseManager::sendStatus(pl, "Opponent is on Turn");
+        notifyOpponent(pl, "Your are on Turn");
+    }
 }
 
 
@@ -275,6 +317,7 @@ void GameManager::log_player_resolve(int client_socket, string name)
     //check if player is logged
     if (pl != NULL)
     {
+        //if player is logged and playing
         if (pl->connected == 0)
         {
             ResponseManager::sendToSpecificSocket(client_socket, "NAME_IS_NOT_AVALIABLE");
@@ -282,20 +325,34 @@ void GameManager::log_player_resolve(int client_socket, string name)
         else
         {
             pl->socket = client_socket;
+            pl->connected = 0;
             
             if (pl->game_id > 0)
             {
-                //reconnect in game
-                cout << "Reconnect" << endl;
+                //reconnect to game
+                cout << "Reconnect player " << pl->name << " to game " << pl->game_id << endl;
+                
+                Game *game = get_running_game(pl->game_id);
+                
+                if (game != NULL)
+                {
+                    ResponseManager::sendGameToClient(pl, game);
+                }
+                else
+                {
+                    cout << "Game with ID " << pl->game_id << " not found" << endl;
+                }
+                
+                
             }
             else
             {
-                //to lobby
-                cout << "Lobby" << endl;
-                ResponseManager::sendState(pl, "LOBBY");
+                //lobby
+                cout << "Player with name: " << pl->name << " now listening on new socket: " << pl->socket << " and was moved to lobby" << endl;
+                
+                ResponseManager::sendToClient(pl, "LOGIN");
             }
             
-            cout << "Player with socket: " << pl->socket << " renamed to " << pl->name << endl;
         }
     }
     else
@@ -323,10 +380,33 @@ void GameManager::print_games()
 void GameManager::exit(Player* pl)
 {
     logged_players.erase(pl->name);
+    delete_player_from_queue(pl, players_queue.size(), 0);
     
     ResponseManager::sendState(pl, "EXIT");
     
+    Server::closeSocket(pl->socket);
+    
     delete pl;
 }
+
+void GameManager::delete_player_from_queue(Player *pl, int n, int curr)
+{
+    // If stack is empty or all items
+    // are traversed
+    if (players_queue.empty() || curr == n)
+        return;
+    
+    // Remove current item
+    Player *tmp = players_queue.top();
+    players_queue.pop();
+    
+    // Remove other items
+    delete_player_from_queue(pl, n, curr+1);
+    
+    // Put all items back except middle
+    if (pl != tmp)
+        players_queue.push(tmp);
+}
+
 
 

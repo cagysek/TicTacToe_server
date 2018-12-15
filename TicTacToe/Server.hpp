@@ -21,6 +21,10 @@ class Server
     public:
         void setUp();
         void listenConnections();
+        static void closeSocket(int socket);
+    
+        static fd_set client_socks, tests;
+    
     private:
         int server_socket, client_socket, fd;
         static struct sockaddr_in server , client, peer_addr;

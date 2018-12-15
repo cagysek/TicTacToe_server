@@ -20,6 +20,8 @@ class Game
         Player *p1;
         Player *p2;
         int id;
+        int size = 3;
+    
         GameLogic *gameLogic;
     
         Game(int id, Player *p1, Player *p2);
