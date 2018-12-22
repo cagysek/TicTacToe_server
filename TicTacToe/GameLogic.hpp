@@ -30,7 +30,7 @@ class GameLogic
         int check_board();
         int get_value(int row, int column);
     
-    Player* last_winner;
+        Player* last_winner;
     
     private:
         int** board;

@@ -9,10 +9,11 @@
 #include <iostream>
 #include "Server.hpp"
 #include "Network.hpp"
+#include "LogManager.hpp"
 
 int main(int argc, const char * argv[])
 {
-    puts("Starting server!");
+    LogManager::log(__FILENAME__, __FUNCTION__, "Starting server!");
     
     Server *server = new Server();
     server->setUp();

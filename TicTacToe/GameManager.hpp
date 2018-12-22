@@ -19,6 +19,7 @@
 #include "GameLogic.hpp"
 #include "ResponseManager.hpp"
 #include "Server.hpp"
+#include "LogManager.hpp"
 
 using namespace std;
 

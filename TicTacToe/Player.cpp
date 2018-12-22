@@ -8,6 +8,9 @@
 
 #include "Player.hpp"
 
+/**
+ *  Constructor for player
+ */
 Player::Player(char *ip, int socket)
 {
     this->ip = ip;
@@ -17,14 +20,24 @@ Player::Player(char *ip, int socket)
     this->connected = 0;
     this->score = 0;
     this->game_indicator = 0;
+    
+    LogManager::log(__FILENAME__, __FUNCTION__, "New player created on socket: " + to_string(socket));
 }
 
+/**
+ *  Setter to player's name
+ */
 void set_name(Player *pl, std::string name)
 {
+    LogManager::log(__FILENAME__, __FUNCTION__, "Player's name changed from " + pl->name + " to " + name);
+    
     pl->name = name;
 }
 
+/**
+ * Player destructor
+ */
 Player::~Player()
 {
-    cout << "Player deleted" << endl;
+    LogManager::log(__FILENAME__, __FUNCTION__, "Player on socket: " + to_string(this->socket) + "was deleted");
 }

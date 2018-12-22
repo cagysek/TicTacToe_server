@@ -13,6 +13,7 @@
 #include "Player.hpp"
 #include "GameLogic.hpp"
 #include <map>
+#include "LogManager.hpp"
 
 class Game
 {

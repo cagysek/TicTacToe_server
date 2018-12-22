@@ -12,6 +12,7 @@
 #include "Player.hpp"
 #include "Game.hpp"
 #include "RequestManager.hpp"
+#include "LogManager.hpp"
 
 #include <stdio.h>
 #include <iostream>

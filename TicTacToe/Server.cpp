@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 
-// kvuli iotctl
+// iotctl
 #include <sys/ioctl.h>
 
 #include <iostream>
@@ -28,22 +28,27 @@
 fd_set Server::client_socks, Server::tests;
 struct sockaddr_in Server::peer_addr, Server::client, Server::server;
 
-
+/**
+ * Server initilization
+ */
 void Server::setUp()
 {
     //Create socket
     server_socket = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
     if (server_socket == -1)
     {
-        printf("Could not create socket");
+        LogManager::log(__FILENAME__, __FUNCTION__, "Could not create socket");
         return;
     }
-    puts("Socket created.");
+    
+    LogManager::log(__FILENAME__, __FUNCTION__, "Socket created");
     
     //set port release
     int enable = 1;
     if ( setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0 )
-        perror("setsockopt(SO_REUSEADDR) failed");
+    {
+       LogManager::log(__FILENAME__, __FUNCTION__, "setsockopt(SO_REUSEADDR) failed");
+    }
     
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
@@ -54,28 +59,28 @@ void Server::setUp()
     if( ::bind(server_socket, (struct sockaddr *) &server, sizeof(server)) < 0 )
     {
         //print the error message
-        perror("Bind failed. Error");
+        LogManager::log(__FILENAME__, __FUNCTION__, "Bind failed. Error");
         return;
     }
-    puts("Bind done.");
+    
+    LogManager::log(__FILENAME__, __FUNCTION__, "Bind done");
     
     //Listen
     if(listen(server_socket , 3) < 0)
     {
-        //print the error message
-        perror("Listen failed. Error");
+        LogManager::log(__FILENAME__, __FUNCTION__, "Listen failed. Error");
         return;
     }
     
     //Accept and incoming connection
-    puts("Server ready!");
+    LogManager::log(__FILENAME__, __FUNCTION__, "Server is ready!");
 }
 
 
 
 void Server::listenConnections()
 {
-    
+    LogManager::log(__FILENAME__, __FUNCTION__, "Start listening");
     
     struct timeval client_timeout;
     client_timeout.tv_sec = 10;
@@ -137,8 +142,6 @@ void Server::listenConnections()
 
                         string msg(cbuf);
                         
-                        cout << "Recv from " << pl->name << " message: " << msg.data() << endl;
-                        
                         RequestManager::resolve(pl, msg);
                         
                         msg.clear();
@@ -152,21 +155,22 @@ void Server::listenConnections()
                         {
                             if (pl->connected != -1)
                             {
-                                cout << "Player: " << pl->name << " socket ID: " << pl->socket << " is disconnected" << endl;
+                                LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " socket ID: " + to_string(pl->socket) + " is disconnected");
+
                                 GameManager::disconected_player(pl->socket);
                             }
                         }
                        
                         //if someone is disconnected remove socket
                         closeSocket(fd);
-                        
                     }
                    
                     else // na socketu se stalo neco spatneho
                     {
                         close(fd);
                         FD_CLR(fd, &client_socks);
-                        printf("Klient se odpojil a byl odebran ze sady socketu\n");
+                        
+                        LogManager::log(__FILENAME__, __FUNCTION__, "Klient se odpojil a byl odebran ze sady socketu");
                     }
                  
                 }
@@ -175,9 +179,13 @@ void Server::listenConnections()
     }
 }
 
+/**
+ * Method to close specific socket
+ */
 void Server::closeSocket(int socket)
 {
-    cout << "Client exit game and was removed from sockets. Socket ID: " << socket << endl;
+    LogManager::log(__FILENAME__, __FUNCTION__, "Closing socket with ID: " + to_string(socket));
+    
     close(socket);
     FD_CLR(socket, &client_socks);
 }

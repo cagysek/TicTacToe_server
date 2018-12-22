@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include "LogManager.hpp"
 
 using namespace std;
 

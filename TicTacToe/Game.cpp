@@ -8,8 +8,12 @@
 
 #include "Game.hpp"
 
+/**
+ *  Constructor for game
+ */
 Game::Game(int id, Player *p1, Player *p2)
 {
+
     this->id = id;
     this->p1 = p1;
     this->p2 = p2;
@@ -23,8 +27,13 @@ Game::Game(int id, Player *p1, Player *p2)
     
     this->gameLogic = new GameLogic();
     this->gameLogic->turn_indicator = p1->game_indicator;
+    
+    LogManager::log(__FILENAME__, __FUNCTION__, "New game with ID: " + to_string(id) + " for players " + p1->name + " and " + p2->name + " created");
 }
 
+/**
+ *  Method to get player's opponent
+ */
 Player* Game::get_opponent(Player* pl)
 {
     if (pl == get_player_1())
@@ -35,7 +44,10 @@ Player* Game::get_opponent(Player* pl)
     return get_player_1();
 }
 
+/**
+ *  Game destructor
+ */
 Game::~Game()
 {
-    cout << "Room deleted" << endl;
+    LogManager::log(__FILENAME__, __FUNCTION__, "Game with ID:" + to_string(this->id) + " deleted");
 }

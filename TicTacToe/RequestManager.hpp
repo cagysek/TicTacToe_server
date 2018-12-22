@@ -15,11 +15,13 @@
 #include "GameManager.hpp"
 #include "Utils.hpp"
 
+#include "LogManager.hpp"
+
 class RequestManager
 {
     public:
         static void resolve(Player *pl, std::string msg);
-    
+
 };
 
 
