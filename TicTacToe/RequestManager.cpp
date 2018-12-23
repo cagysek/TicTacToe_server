@@ -104,7 +104,7 @@ void RequestManager::resolve(Player *pl, std::string msg)
         }
         else if ( type.compare("EXIT") == 0)
         {
-            if (pl->state.compare("LOBBY") == 0)
+            if (pl->state.compare("LOBBY") == 0 || pl->state.compare("WAITING") == 0)
             {
                 GameManager::exit(pl);
             }

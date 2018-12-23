@@ -22,7 +22,7 @@ class Server
 {
     public:
 
-        void setUp(Configuration *configuration);
+        int setUp(Configuration *configuration);
         void listenConnections();
         static void closeSocket(int socket);
         void disconnect(int socket);

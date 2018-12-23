@@ -31,16 +31,16 @@ struct sockaddr_in Server::peer_addr, Server::client, Server::server;
 /**
  * Server initilization
  */
-void Server::setUp(Configuration *config)
+int Server::setUp(Configuration *config)
 {
     LogManager::log(__FILENAME__, __FUNCTION__, "IP: " + config->ip + " Port: " + to_string(config->port) + " Max_games: " + to_string(config->max_games));
     
     //Create socket
-    server_socket = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
-    if (server_socket == -1)
+    server_socket = socket(AF_INET , SOCK_STREAM , 0);
+    if (server_socket < 0)
     {
         LogManager::log(__FILENAME__, __FUNCTION__, "Could not create socket");
-        return;
+        return -1;
     }
     
     LogManager::log(__FILENAME__, __FUNCTION__, "Socket created");
@@ -51,6 +51,8 @@ void Server::setUp(Configuration *config)
     {
        LogManager::log(__FILENAME__, __FUNCTION__, "setsockopt(SO_REUSEADDR) failed");
     }
+    
+    
     
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
@@ -87,7 +89,7 @@ void Server::setUp(Configuration *config)
     {
         //print the error message
         LogManager::log(__FILENAME__, __FUNCTION__, "Bind failed. Error");
-        return;
+        return -1;
     }
     
     LogManager::log(__FILENAME__, __FUNCTION__, "Bind done");
@@ -96,19 +98,22 @@ void Server::setUp(Configuration *config)
     if(listen(server_socket , 3) < 0)
     {
         LogManager::log(__FILENAME__, __FUNCTION__, "Listen failed. Error");
-        return;
+        return -1;
     }
     
     GameManager::set_max_games(config->max_games);
     
     //Accept and incoming connection
     LogManager::log(__FILENAME__, __FUNCTION__, "Server is ready!");
+    
+    return 0;
 }
 
 
 
 void Server::listenConnections()
 {
+    
     LogManager::log(__FILENAME__, __FUNCTION__, "Start listening");
     
     struct timeval client_timeout;

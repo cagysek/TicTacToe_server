@@ -99,20 +99,20 @@ void ResponseManager::sendGameToClient(Player *pl, Game *game)
     LogManager::log(__FILENAME__, __FUNCTION__, "Preparing message for player " + pl->name);
     
     string msg = "RECONNECT;";
-    for (int i = 0 ; i < game->size ; i++)
+    for (int i = 0 ; i < game->gameLogic->SIZE ; i++)
     {
     
-        for (int j = 0 ; j < game->size ; j++)
+        for (int j = 0 ; j < game->gameLogic->SIZE ; j++)
         {
             int val = game->gameLogic->get_value(i, j);
             msg += to_string(val);
-            if (j + 1 < game->size)
+            if (j + 1 < game->gameLogic->SIZE)
             {
                 msg += ",";
             }
         }
 
-        if (i + 1 < game->size)
+        if (i + 1 < game->gameLogic->SIZE)
         {
             msg += ",";
         }

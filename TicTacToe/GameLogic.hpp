@@ -16,11 +16,11 @@ using namespace std;
 
 class GameLogic
 {
-    static const int SIZE = 3;
+    
     
     public:
         GameLogic();
-    
+        static const int SIZE = 3;
         int turn_indicator;
         int** initialize_board();
     

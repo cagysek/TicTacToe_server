@@ -37,9 +37,12 @@ int main(int argc, const char * argv[])
         Configuration *configuration = new Configuration(argv[1], atoi(argv[2]),atoi(argv[3]));
     
         Server *server = new Server();
-        server->setUp(configuration);
+        int result = server->setUp(configuration);
         
-        server->listenConnections();
+        if (result == 0)
+        {
+            server->listenConnections();
+        }
         
         delete(server);
         delete(configuration);
