@@ -49,6 +49,7 @@ class GameManager
         static void player_ping(Player* pl);
         
         static void exit(Player* pl);
+    static void timeout_game_exit(Player* pl);
     
     static int MAX_GAMES;
     static void set_max_games(int max_games);

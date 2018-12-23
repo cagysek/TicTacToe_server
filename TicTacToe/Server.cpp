@@ -54,7 +54,6 @@ void Server::setUp(Configuration *config)
     
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
-    
 /*
     if (config->ip.compare("localhost") == 0)
     {
@@ -77,10 +76,10 @@ void Server::setUp(Configuration *config)
             server.sin_addr.s_addr = inAddr;
         }
     }
- */
+*/
     server.sin_port = htons(config->port);
  
-    server.sin_addr.s_addr = INADDR_ANY;
+   server.sin_addr.s_addr = INADDR_ANY;
   //  server.sin_port = htons(10000);
     
     //Bind
@@ -113,7 +112,7 @@ void Server::listenConnections()
     LogManager::log(__FILENAME__, __FUNCTION__, "Start listening");
     
     struct timeval client_timeout;
-    client_timeout.tv_sec = 10;
+    client_timeout.tv_sec = 180;
     
     FD_ZERO(&client_socks);
     FD_SET(server_socket, &client_socks);
@@ -168,7 +167,19 @@ void Server::listenConnections()
                         //clearbuffer
                         memset(cbuf, 0, 1024);
                         
-                        recv(pl->socket , &cbuf , 1024 , 0);
+                        int recv_result = (int)recv(pl->socket , &cbuf , 1024 , 0);
+                        
+                        // lost connection
+                        if (recv_result <= 0)
+                        {
+                            disconnect(fd);
+                        }
+                        
+                        //timeout
+                        if (return_value == 0)
+                        {
+                            GameManager::exit(pl);
+                        }
 
                         string msg(cbuf);
                         
@@ -177,22 +188,10 @@ void Server::listenConnections()
                         msg.clear();
                         
                     }
+                    // if gui is closed by ctrl+c
                     else if (a2read == 0)
                     {
-                        Player *pl = GameManager::get_logged_player_by_socket(fd);
-                        
-                        if (pl != NULL)
-                        {
-                            if (pl->connected != -1)
-                            {
-                                LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " socket ID: " + to_string(pl->socket) + " is disconnected");
-
-                                GameManager::disconected_player(pl->socket);
-                            }
-                        }
-                       
-                        //if someone is disconnected remove socket
-                        closeSocket(fd);
+                        disconnect(fd);
                     }
                    
                     else // na socketu se stalo neco spatneho
@@ -200,13 +199,31 @@ void Server::listenConnections()
                         close(fd);
                         FD_CLR(fd, &client_socks);
                         
-                        LogManager::log(__FILENAME__, __FUNCTION__, "Klient se odpojil a byl odebran ze sady socketu");
+                        LogManager::log(__FILENAME__, __FUNCTION__, "Something bad happened on ioct");
                     }
                  
                 }
             }
         }
     }
+}
+
+void Server::disconnect(int socket)
+{
+    Player *pl = GameManager::get_logged_player_by_socket(socket);
+    
+    if (pl != NULL)
+    {
+        if (pl->connected != -1)
+        {
+            LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " socket ID: " + to_string(pl->socket) + " disconnecting...");
+            
+            GameManager::disconected_player(pl->socket);
+        }
+    }
+    
+    //if someone is disconnected remove socket
+    closeSocket(socket);
 }
 
 /**

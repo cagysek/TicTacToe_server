@@ -302,6 +302,9 @@ void GameManager::rematch(Player *pl)
         ResponseManager::sendState(pl, "STARTING_GAME;0;");
         ResponseManager::sendState(game->get_opponent(pl), "STARTING_GAME;0;");
         
+        ResponseManager::sendStatus(game->get_opponent(game_logic->last_winner), "Your are on Turn;");
+        ResponseManager::sendStatus(game_logic->last_winner, "Opponent is on Turn;");
+        
         pl->want_rematch = false;
         game->get_opponent(pl)->want_rematch = false;
     }
@@ -309,7 +312,11 @@ void GameManager::rematch(Player *pl)
     {
         LogManager::log(__FILENAME__, __FUNCTION__, "Game ID: " + to_string(game->id) + " Player:" + pl->name + " waiting for opponent decision");
         
+        
         ResponseManager::sendState(pl, "WAITING;0;");
+        
+        ResponseManager::sendStatus(game->get_opponent(pl), "Opponent wants rematch!");
+        
     }
 }
 
@@ -329,12 +336,16 @@ void GameManager::close_game(Player *pl)
     pl->score = 0;
     pl->game_indicator = 0;
     
-    game->get_opponent(pl)->game_id = 0;
-    game->get_opponent(pl)->score = 0;
-    game->get_opponent(pl)->game_indicator = 0;
+    auto *opponent = game->get_opponent(pl);
+    
+    opponent->game_id = 0;
+    opponent->score = 0;
+    opponent->game_indicator = 0;
     
     ResponseManager::sendResult(pl, "CLOSE_GAME;0");
-    ResponseManager::sendResult(game->get_opponent(pl), "CLOSE_GAME;0");
+    ResponseManager::sendResult(opponent, "CLOSE_GAME;0");
+    
+    ResponseManager::sendState(opponent, "OPPONENT_LEFT_GAME");
     
     delete game;
 }
@@ -346,12 +357,12 @@ void GameManager::disconected_player(int pl_socket)
 {
     Player* pl = get_logged_player_by_socket(pl_socket);
     
-    LogManager::log(__FILENAME__, __FUNCTION__, "Disconnecting player: " + pl->name);
-    
     notifyOpponent(pl, "Opponent is disconnected");
     
     pl->connected = -1;
     pl->socket = -1;
+    
+    LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " has been disconnected");
 }
 
 /**
@@ -426,7 +437,7 @@ void GameManager::log_player_resolve(int client_socket, string name)
             //name UnKnow is used as default name, for this reason is not avaliable
             if (pl->connected == 0 || name.compare("UnKnow") == 0)
             {
-                LogManager::log(__FILENAME__, __FUNCTION__, "Player on socket: " + to_string(client_socket) + " name: " + name + " this name is not avaliable");
+                LogManager::log(__FILENAME__, __FUNCTION__, "Player on socket: " + to_string(client_socket) + " send name: " + name + ", but this name is not avaliable");
                 
                 ResponseManager::sendToSpecificSocket(client_socket, "NAME_IS_NOT_AVALIABLE");
             }
@@ -441,7 +452,7 @@ void GameManager::log_player_resolve(int client_socket, string name)
                 else
                 {
                     //lobby
-                    LogManager::log(__FILENAME__, __FUNCTION__, "Player with name: " + pl->name + " now listening on new socket: " + to_string(pl->socket) + " and was moved to lobby");
+                    LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " now listening on new socket: " + to_string(pl->socket) + " and has been moved to lobby");
                     
                     ResponseManager::sendToClient(pl, "LOGIN");
                 }
@@ -480,7 +491,7 @@ void GameManager::print_games()
  */
 void GameManager::exit(Player* pl)
 {
-    LogManager::log(__FILENAME__, __FUNCTION__, "Closing game for player with name: " + pl->name);
+    LogManager::log(__FILENAME__, __FUNCTION__, "Closing game for player: " + pl->name);
     
     int queue_size = static_cast<int>(players_queue.size());
     
@@ -489,6 +500,11 @@ void GameManager::exit(Player* pl)
     delete_player_from_queue(pl, queue_size, 0);
     
     ResponseManager::sendState(pl, "EXIT");
+    
+    if (pl->game_id > 0)
+    {
+        GameManager::timeout_game_exit(pl);
+    }
     
     Server::closeSocket(pl->socket);
     
@@ -519,7 +535,7 @@ void GameManager::delete_player_from_queue(Player *pl, int n, int curr)
     }
     else
     {
-        LogManager::log(__FILENAME__, __FUNCTION__, "Player with name: " + pl->name + " has been removed from game queue");
+        LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " has been removed from game queue");
     }
 }
 
@@ -528,5 +544,27 @@ void GameManager::set_max_games(int max_games)
     GameManager::MAX_GAMES = max_games;
 }
 
+void GameManager::timeout_game_exit(Player *pl)
+{
+    Game* game = get_running_game(pl->game_id);
+    
+    LogManager::log(__FILENAME__, __FUNCTION__, "Game ID: " + to_string(game->id) + " Player:" + pl->name + " closing game");
+    
+    running_games.erase(game->id);
+    
+    auto *opponent = game->get_opponent(pl);
+    
+    //reseting opponent statistics
+    opponent->game_id = 0;
+    opponent->score = 0;
+    opponent->game_indicator = 0;
+    
+    LogManager::log(__FILENAME__, __FUNCTION__, "Game ID: " + to_string(game->id) + " sending information to opponent " + opponent->name);
+    
+    ResponseManager::sendState(opponent, "LOBBY");
+    ResponseManager::sendStatus(opponent, "Opponent did not return. NOOB");
+    
+    delete game;
+}
 
 

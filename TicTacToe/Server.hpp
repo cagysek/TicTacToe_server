@@ -25,6 +25,7 @@ class Server
         void setUp(Configuration *configuration);
         void listenConnections();
         static void closeSocket(int socket);
+        void disconnect(int socket);
     
         static fd_set client_socks, tests;
     

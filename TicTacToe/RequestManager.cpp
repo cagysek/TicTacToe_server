@@ -70,7 +70,7 @@ void RequestManager::resolve(Player *pl, std::string msg)
         }
         else
         {
-            LogManager::log(__FILENAME__, __FUNCTION__, "Unknown message type recieved. Type:" + type);
+            LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " unknown message type recieved. Type:" + type);
         }
     }
 }
