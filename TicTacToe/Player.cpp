@@ -20,6 +20,7 @@ Player::Player(char *ip, int socket)
     this->connected = 0;
     this->score = 0;
     this->game_indicator = 0;
+    this->state = "NEW";
     
     LogManager::log(__FILENAME__, __FUNCTION__, "New player created on socket: " + to_string(socket));
 }

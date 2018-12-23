@@ -32,41 +32,87 @@ void RequestManager::resolve(Player *pl, std::string msg)
         
         if ( type.compare("NAME") == 0 )
         {
-            string name = "";
-            if (msg_parts.size() > 1 && !msg_parts[1].empty())
+            if (pl->state.compare("NEW") == 0)
             {
-                name = msg_parts[1];
+                string name = "";
+                if (msg_parts.size() > 1 && !msg_parts[1].empty())
+                {
+                    name = msg_parts[1];
+                }
+                
+                GameManager::log_player_resolve(pl->socket, name);
+                
+                pl->state = "LOBBY";
             }
-            
-            GameManager::log_player_resolve(pl->socket, name);
+            else
+            {
+                LogManager::log(__FILENAME__, __FUNCTION__, "NAME: Invalid operation. Player:" + pl->name + " is in state: " + pl->state + ". Can not do this operation");
+            }
         }
         else if ( type.compare("FIND_GAME") == 0 )
         {
-            GameManager::want_play(pl);
+            if (pl->state.compare("LOBBY") == 0)
+            {
+                GameManager::want_play(pl);
+            }
+            else
+            {
+                LogManager::log(__FILENAME__, __FUNCTION__, "FIND_GAME: Invalid operation. Player:" + pl->name + " is in state: " + pl->state + ". Can not do this operation");
+            }
         }
         else if ( type.compare("TURN") == 0 )
         {
-            try {
-                int row = stoi(msg_parts[1]);
-                int column = stoi(msg_parts[2]);
-                
-                GameManager::turn(pl, row, column);
-                
-            } catch (const exception &exc) {
-                LogManager::log(__FILENAME__, __FUNCTION__, "Invalid input from player: " + pl->name + ". Msg: " + msg + ". Err: " + exc.what());
+            if (pl->state.compare("IN_GAME") == 0)
+            {
+                try {
+                    int row = stoi(msg_parts[1]);
+                    int column = stoi(msg_parts[2]);
+                    
+                    GameManager::turn(pl, row, column);
+                    
+                } catch (const exception &exc) {
+                    LogManager::log(__FILENAME__, __FUNCTION__, "Invalid input from player: " + pl->name + ". Msg: " + msg + ". Err: " + exc.what());
+                }
+            }
+            else
+            {
+                LogManager::log(__FILENAME__, __FUNCTION__, "TURN: Invalid operation. Player:" + pl->name + " is in state: " + pl->state + ". Can not do this operation");
             }
         }
         else if ( type.compare("REMATCH") == 0 )
         {
-            GameManager::rematch(pl);
+            if (pl->state.compare("RESULT") == 0)
+            {
+                GameManager::rematch(pl);
+            }
+            else
+            {
+                LogManager::log(__FILENAME__, __FUNCTION__, "REMATCH: Invalid operation. Player:" + pl->name + " is in state: " + pl->state + ". Can not do this operation");
+            }
         }
         else if ( type.compare("CLOSE_GAME") == 0 )
         {
-            GameManager::close_game(pl);
+            if (pl->state.compare("RESULT") == 0)
+            {
+                GameManager::close_game(pl);
+            }
+            else
+            {
+                LogManager::log(__FILENAME__, __FUNCTION__, "CLOSE_GAME: Invalid operation. Player:" + pl->name + " is in state: " + pl->state + ". Can not do this operation");
+            }
+            
         }
         else if ( type.compare("EXIT") == 0)
         {
-            GameManager::exit(pl);
+            if (pl->state.compare("LOBBY") == 0)
+            {
+                GameManager::exit(pl);
+            }
+            else
+            {
+                LogManager::log(__FILENAME__, __FUNCTION__, "EXIT: Invalid operation. Player:" + pl->name + " is in state: " + pl->state + ". Can not do this operation");
+            }
+            
         }
         else
         {

@@ -20,7 +20,6 @@ class Player
     public:
         char *ip;
         int socket;
-        char *message_in;
         int game_id;
     
         int connected;
@@ -31,6 +30,8 @@ class Player
         string name;
         string msg_in;
         string msg_out;
+    
+        string state;
     
         bool want_rematch;
     

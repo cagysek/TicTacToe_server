@@ -126,6 +126,8 @@ void GameManager::want_play(Player* pl)
             players_queue.push(pl);
             ResponseManager::sendState(pl, "WAITING;0");
             
+            pl->state = "WAITING";
+            
         }
         else
         {
@@ -133,6 +135,9 @@ void GameManager::want_play(Player* pl)
             
             ResponseManager::sendState(pl, "STARTING_GAME;0");
             ResponseManager::sendState(opponent, "STARTING_GAME;0");
+            
+            pl->state = "IN_GAME";
+            opponent->state = "IN_GAME";
             
             create_game(pl, opponent);
             
@@ -222,6 +227,9 @@ void GameManager::turn(Player* pl, int row, int column)
             
             Player* opponent = game->get_opponent(pl);
             
+            pl->state = "RESULT";
+            opponent->state = "RESULT";
+            
             ResponseManager::sendResult(pl, "TIE;" + to_string(pl->score) + ";" + to_string(opponent->score));
             ResponseManager::sendResult(opponent, "TIE;" + to_string(opponent->score) + ";" + to_string(pl->score));
         }
@@ -232,6 +240,9 @@ void GameManager::turn(Player* pl, int row, int column)
             pl->score += 1;
             
             Player* opponent = game->get_opponent(pl);
+            
+            pl->state = "RESULT";
+            opponent->state = "RESULT";
             
             ResponseManager::sendResult(pl, "WIN;" + to_string(pl->score) + ";" + to_string(opponent->score));
             ResponseManager::sendResult(opponent, "LOSE;" + to_string(opponent->score) + ";" + to_string(pl->score));
@@ -307,6 +318,9 @@ void GameManager::rematch(Player *pl)
         
         pl->want_rematch = false;
         game->get_opponent(pl)->want_rematch = false;
+        
+        pl->state = "IN_GAME";
+        game->get_opponent(pl)->state = "IN_GAME";
     }
     else
     {
@@ -345,7 +359,10 @@ void GameManager::close_game(Player *pl)
     ResponseManager::sendResult(pl, "CLOSE_GAME;0");
     ResponseManager::sendResult(opponent, "CLOSE_GAME;0");
     
-    ResponseManager::sendState(opponent, "OPPONENT_LEFT_GAME");
+    ResponseManager::sendStatus(opponent, "Opponent left game");
+    
+    pl->state = "LOBBY";
+    opponent->state = "LOBBY";
     
     delete game;
 }
@@ -396,6 +413,8 @@ void GameManager::reconnected_player(Player *pl, int new_socket)
     
     if (game != NULL)
     {
+        pl->state = "IN_GAME";
+        
         ResponseManager::sendGameToClient(pl, game);
         
         if (game->gameLogic->turn_indicator == pl->game_indicator)
@@ -414,6 +433,8 @@ void GameManager::reconnected_player(Player *pl, int new_socket)
     //if game is not exists anymore
     else
     {
+        pl->state = "LOBBY";
+        
         LogManager::log(__FILENAME__, __FUNCTION__, "Reconnecting player: " + pl->name + " to game: " + to_string(pl->game_id) + " FAILED. Player moved to lobby");
         ResponseManager::sendToClient(pl, "LOGIN");
     }
