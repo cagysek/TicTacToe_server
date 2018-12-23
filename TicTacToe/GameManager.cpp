@@ -15,6 +15,8 @@ map<int, Game*> GameManager::running_games;
 
 int GameManager::game_id_generator = 1;
 
+int GameManager::MAX_GAMES;
+
 /**
  *  Method to create unloged player
  */
@@ -112,25 +114,34 @@ Player* GameManager::get_logged_player_by_name(string name)
 void GameManager::want_play(Player* pl)
 {
     LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " is seeking for opponent");
-    auto *opponent = find_opponent();
     
-    if (opponent == NULL)
+    if (running_games.size() < GameManager::MAX_GAMES)
     {
-        LogManager::log(__FILENAME__, __FUNCTION__, "Opponent not found. Player: " + pl->name + " has beed added to queue");
+        auto *opponent = find_opponent();
         
-        players_queue.push(pl);
-        ResponseManager::sendState(pl, "WAITING;0");
-        
+        if (opponent == NULL)
+        {
+            LogManager::log(__FILENAME__, __FUNCTION__, "Opponent not found. Player: " + pl->name + " has beed added to queue");
+            
+            players_queue.push(pl);
+            ResponseManager::sendState(pl, "WAITING;0");
+            
+        }
+        else
+        {
+            LogManager::log(__FILENAME__, __FUNCTION__, "Opponent found. Opponent name: " + opponent->name);
+            
+            ResponseManager::sendState(pl, "STARTING_GAME;0");
+            ResponseManager::sendState(opponent, "STARTING_GAME;0");
+            
+            create_game(pl, opponent);
+            
+        }
     }
     else
     {
-        LogManager::log(__FILENAME__, __FUNCTION__, "Opponent found. Opponent name: " + opponent->name);
-        
-        ResponseManager::sendState(pl, "STARTING_GAME;0");
-        ResponseManager::sendState(opponent, "STARTING_GAME;0");
-        
-        create_game(pl, opponent);
-        
+        LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " can not play, because maximum limit of games is reached");
+        ResponseManager::sendState(pl, "MAXIMUM_GAMES_REACHED");
     }
 
 }
@@ -348,14 +359,16 @@ void GameManager::disconected_player(int pl_socket)
  */
 void GameManager::notifyOpponent(Player *pl, string msg)
 {
-    auto game = get_running_game(pl->game_id);
-    
-    auto opponent = game->get_opponent(pl);
-    
-    LogManager::log(__FILENAME__, __FUNCTION__, "Game ID: " + to_string(game->id) + " notify " + pl->name + "'s" + "opponent " + opponent->name + " with message: " + msg);
-    
-    ResponseManager::sendStatus(opponent, msg);
-    
+    if (pl->game_id > 0)
+    {
+        auto game = get_running_game(pl->game_id);
+        
+        auto opponent = game->get_opponent(pl);
+        
+        LogManager::log(__FILENAME__, __FUNCTION__, "Game ID: " + to_string(game->id) + " notify " + pl->name + "'s" + " opponent " + opponent->name + " with message: " + msg);
+        
+        ResponseManager::sendStatus(opponent, msg);
+    }
 }
 
 /**
@@ -443,6 +456,7 @@ void GameManager::log_player_resolve(int client_socket, string name)
     else
     {
         LogManager::log(__FILENAME__, __FUNCTION__, "Socket: " + to_string(client_socket) + " invalid name: \"" + name + "\"");
+        ResponseManager::sendToSpecificSocket(client_socket, "INVALID_NAME");
     }
 }
 
@@ -507,6 +521,11 @@ void GameManager::delete_player_from_queue(Player *pl, int n, int curr)
     {
         LogManager::log(__FILENAME__, __FUNCTION__, "Player with name: " + pl->name + " has been removed from game queue");
     }
+}
+
+void GameManager::set_max_games(int max_games)
+{
+    GameManager::MAX_GAMES = max_games;
 }
 
 

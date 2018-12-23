@@ -50,6 +50,9 @@ class GameManager
         
         static void exit(Player* pl);
     
+    static int MAX_GAMES;
+    static void set_max_games(int max_games);
+    
     static void delete_player_from_queue(Player* pl, int n, int curr);
     static void notifyOpponent(Player* pl, string msg);
     

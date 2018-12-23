@@ -13,6 +13,7 @@
 #include "Game.hpp"
 #include "RequestManager.hpp"
 #include "LogManager.hpp"
+#include "Configuration.hpp"
 
 #include <stdio.h>
 #include <iostream>
@@ -20,7 +21,8 @@
 class Server
 {
     public:
-        void setUp();
+
+        void setUp(Configuration *configuration);
         void listenConnections();
         static void closeSocket(int socket);
     

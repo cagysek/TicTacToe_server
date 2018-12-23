@@ -32,7 +32,12 @@ void RequestManager::resolve(Player *pl, std::string msg)
         
         if ( type.compare("NAME") == 0 )
         {
-            string name = msg_parts[1];
+            string name = "";
+            if (msg_parts.size() > 1 && !msg_parts[1].empty())
+            {
+                name = msg_parts[1];
+            }
+            
             GameManager::log_player_resolve(pl->socket, name);
         }
         else if ( type.compare("FIND_GAME") == 0 )
@@ -49,9 +54,6 @@ void RequestManager::resolve(Player *pl, std::string msg)
                 
             } catch (const exception &exc) {
                 LogManager::log(__FILENAME__, __FUNCTION__, "Invalid input from player: " + pl->name + ". Msg: " + msg + ". Err: " + exc.what());
-                
-                //pridat repsonse na invalid input
-                cout << "Invalid input." << endl;
             }
         }
         else if ( type.compare("REMATCH") == 0 )

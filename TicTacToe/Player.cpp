@@ -39,5 +39,5 @@ void set_name(Player *pl, std::string name)
  */
 Player::~Player()
 {
-    LogManager::log(__FILENAME__, __FUNCTION__, "Player on socket: " + to_string(this->socket) + "was deleted");
+    LogManager::log(__FILENAME__, __FUNCTION__, "Player on socket: " + to_string(this->socket) + " has been deleted");
 }

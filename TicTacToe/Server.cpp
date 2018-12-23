@@ -31,8 +31,10 @@ struct sockaddr_in Server::peer_addr, Server::client, Server::server;
 /**
  * Server initilization
  */
-void Server::setUp()
+void Server::setUp(Configuration *config)
 {
+    LogManager::log(__FILENAME__, __FUNCTION__, "IP: " + config->ip + " Port: " + to_string(config->port) + " Max_games: " + to_string(config->max_games));
+    
     //Create socket
     server_socket = socket(AF_INET , SOCK_STREAM , IPPROTO_TCP);
     if (server_socket == -1)
@@ -52,8 +54,34 @@ void Server::setUp()
     
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
+    
+/*
+    if (config->ip.compare("localhost") == 0)
+    {
+        server.sin_addr.s_addr = inet_addr("127.0.0.1");
+    }
+    else if (config->ip.compare("INADDR_ANY") == 0)
+    {
+        server.sin_addr.s_addr = INADDR_ANY;
+    }
+    else
+    {
+        in_addr_t inAddr = inet_addr(config->ip.data());
+        if (inAddr == -1)
+        {
+            LogManager::log(__FILENAME__, __FUNCTION__, "Invalid IP adddress");
+            return;
+        }
+        else
+        {
+            server.sin_addr.s_addr = inAddr;
+        }
+    }
+ */
+    server.sin_port = htons(config->port);
+ 
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(10000);
+  //  server.sin_port = htons(10000);
     
     //Bind
     if( ::bind(server_socket, (struct sockaddr *) &server, sizeof(server)) < 0 )
@@ -71,6 +99,8 @@ void Server::setUp()
         LogManager::log(__FILENAME__, __FUNCTION__, "Listen failed. Error");
         return;
     }
+    
+    GameManager::set_max_games(config->max_games);
     
     //Accept and incoming connection
     LogManager::log(__FILENAME__, __FUNCTION__, "Server is ready!");
@@ -189,4 +219,7 @@ void Server::closeSocket(int socket)
     close(socket);
     FD_CLR(socket, &client_socks);
 }
+
+
+
 

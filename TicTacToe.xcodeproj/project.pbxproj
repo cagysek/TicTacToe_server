@@ -16,6 +16,7 @@
 		16252F2A21A2EB3300C62062 /* GameManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16252F2821A2EB3300C62062 /* GameManager.cpp */; };
 		1644187921B0229000D174E9 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1644187721B0229000D174E9 /* Utils.cpp */; };
 		16879AB621C5204100B9931A /* LogManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16879AB421C5204100B9931A /* LogManager.cpp */; };
+		16952CD321CEF64900E05103 /* Configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16952CD121CEF64900E05103 /* Configuration.cpp */; };
 		16DCAE4C21A75D0C0022196F /* ResponseManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16DCAE4A21A75D0C0022196F /* ResponseManager.cpp */; };
 /* End PBXBuildFile section */
 
@@ -50,6 +51,8 @@
 		1644187821B0229000D174E9 /* Utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Utils.hpp; sourceTree = "<group>"; };
 		16879AB421C5204100B9931A /* LogManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogManager.cpp; sourceTree = "<group>"; };
 		16879AB521C5204100B9931A /* LogManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LogManager.hpp; sourceTree = "<group>"; };
+		16952CD121CEF64900E05103 /* Configuration.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Configuration.cpp; sourceTree = "<group>"; };
+		16952CD221CEF64900E05103 /* Configuration.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Configuration.hpp; sourceTree = "<group>"; };
 		16DCAE4A21A75D0C0022196F /* ResponseManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ResponseManager.cpp; sourceTree = "<group>"; };
 		16DCAE4B21A75D0C0022196F /* ResponseManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ResponseManager.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -103,6 +106,8 @@
 				1644187821B0229000D174E9 /* Utils.hpp */,
 				16879AB421C5204100B9931A /* LogManager.cpp */,
 				16879AB521C5204100B9931A /* LogManager.hpp */,
+				16952CD121CEF64900E05103 /* Configuration.cpp */,
+				16952CD221CEF64900E05103 /* Configuration.hpp */,
 			);
 			path = TicTacToe;
 			sourceTree = "<group>";
@@ -163,6 +168,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16952CD321CEF64900E05103 /* Configuration.cpp in Sources */,
 				16879AB621C5204100B9931A /* LogManager.cpp in Sources */,
 				160F18462199F7E60044DCC5 /* main.cpp in Sources */,
 				16252F2A21A2EB3300C62062 /* GameManager.cpp in Sources */,
