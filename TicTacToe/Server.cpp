@@ -56,7 +56,7 @@ int Server::setUp(Configuration *config)
     
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
-/*
+
     if (config->ip.compare("localhost") == 0)
     {
         server.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -71,17 +71,17 @@ int Server::setUp(Configuration *config)
         if (inAddr == -1)
         {
             LogManager::log(__FILENAME__, __FUNCTION__, "Invalid IP adddress");
-            return;
+            return -1;
         }
         else
         {
             server.sin_addr.s_addr = inAddr;
         }
     }
-*/
+
     server.sin_port = htons(config->port);
  
-   server.sin_addr.s_addr = INADDR_ANY;
+   //server.sin_addr.s_addr = INADDR_ANY;
   //  server.sin_port = htons(10000);
     
     //Bind
@@ -117,7 +117,9 @@ void Server::listenConnections()
     LogManager::log(__FILENAME__, __FUNCTION__, "Start listening");
     
     struct timeval client_timeout;
-    client_timeout.tv_sec = 180;
+    //client_timeout.tv_sec = 180;
+    client_timeout.tv_sec = 60;
+    
     
     FD_ZERO(&client_socks);
     FD_SET(server_socket, &client_socks);
