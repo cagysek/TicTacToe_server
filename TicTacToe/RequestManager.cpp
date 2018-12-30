@@ -41,8 +41,7 @@ void RequestManager::resolve(Player *pl, std::string msg)
                 }
                 
                 GameManager::log_player_resolve(pl->socket, name);
-                
-                pl->state = "LOBBY";
+            
             }
             else
             {
@@ -113,6 +112,10 @@ void RequestManager::resolve(Player *pl, std::string msg)
                 LogManager::log(__FILENAME__, __FUNCTION__, "EXIT: Invalid operation. Player:" + pl->name + " is in state: " + pl->state + ". Can not do this operation");
             }
             
+        }
+        else if (type.compare("ACK") == 0)
+        {
+            pl->ping_status = true;
         }
         else
         {

@@ -1,4 +1,4 @@
-CC := g++
+CC := g++ -std=c++0x -pthread
 CFLAGS := -Wall -g
 TARGET := server
 

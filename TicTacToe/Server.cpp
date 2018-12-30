@@ -81,7 +81,7 @@ int Server::setUp(Configuration *config)
 
     server.sin_port = htons(config->port);
  
-   //server.sin_addr.s_addr = INADDR_ANY;
+//   server.sin_addr.s_addr = INADDR_ANY;
   //  server.sin_port = htons(10000);
     
     //Bind
@@ -118,7 +118,8 @@ void Server::listenConnections()
     
     struct timeval client_timeout;
     //client_timeout.tv_sec = 180;
-    client_timeout.tv_sec = 60;
+    client_timeout.tv_sec = 0;
+    client_timeout.tv_usec = 100;
     
     
     FD_ZERO(&client_socks);
@@ -174,19 +175,7 @@ void Server::listenConnections()
                         //clearbuffer
                         memset(cbuf, 0, 1024);
                         
-                        int recv_result = (int)recv(pl->socket , &cbuf , 1024 , 0);
-                        
-                        // lost connection
-                        if (recv_result <= 0)
-                        {
-                            disconnect(fd);
-                        }
-                        
-                        //timeout
-                        if (return_value == 0)
-                        {
-                            GameManager::exit(pl);
-                        }
+                        recv(pl->socket , &cbuf , 1024 , 0);
 
                         string msg(cbuf);
                         
@@ -219,18 +208,10 @@ void Server::disconnect(int socket)
 {
     Player *pl = GameManager::get_logged_player_by_socket(socket);
     
-    if (pl != NULL)
+    if (pl == NULL)
     {
-        if (pl->connected != -1)
-        {
-            LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " socket ID: " + to_string(pl->socket) + " disconnecting...");
-            
-            GameManager::disconected_player(pl->socket);
-        }
+        closeSocket(socket);
     }
-    
-    //if someone is disconnected remove socket
-    closeSocket(socket);
 }
 
 /**

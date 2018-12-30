@@ -17,6 +17,9 @@ int GameManager::game_id_generator = 1;
 
 int GameManager::MAX_GAMES;
 
+int TIMEOUT = 180;
+int PING_INTERVAL = 5;
+
 /**
  *  Method to create unloged player
  */
@@ -45,8 +48,15 @@ void GameManager::log_player(int client_socket, string name)
     
     pl->set_name(name.data());
     
+    pl->state = "LOBBY";
+    
     GameManager::logged_players.insert(make_pair(name, pl));
     
+    pl->ping_thread = thread(GameManager::ping_player, pl);
+    pl->is_thread_running = true;
+//    pl->ping_thread.join();
+  //  pl->thread t1(GameManager::ping_player, pl);
+ //   t1.detach();
     ResponseManager::sendToClient(pl, "LOGIN");
 }
 
@@ -339,47 +349,70 @@ void GameManager::rematch(Player *pl)
  */
 void GameManager::close_game(Player *pl)
 {
-    Game* game = get_running_game(pl->game_id);
+    if (pl->game_id > 0)
+    {
+        Game* game = get_running_game(pl->game_id);
+        
+        LogManager::log(__FILENAME__, __FUNCTION__, "Game ID: " + to_string(game->id) + " Player:" + pl->name + " exit game");
+        
+        running_games.erase(game->id);
+        
+        //reseting players statistics
+        pl->game_id = 0;
+        pl->score = 0;
+        pl->game_indicator = 0;
+        
+        auto *opponent = game->get_opponent(pl);
+        
+        opponent->game_id = 0;
+        opponent->score = 0;
+        opponent->game_indicator = 0;
+        
+        ResponseManager::sendResult(pl, "CLOSE_GAME;0");
+        ResponseManager::sendResult(opponent, "CLOSE_GAME;0");
+        
+        ResponseManager::sendStatus(opponent, "Opponent left game");
+        
+        pl->state = "LOBBY";
+        opponent->state = "LOBBY";
+        
+        delete game;
+    }
+    else
+    {
+        LogManager::log(__FILENAME__, __FUNCTION__, " Player:" + pl->name + " is not in game");
+    }
     
-    LogManager::log(__FILENAME__, __FUNCTION__, "Game ID: " + to_string(game->id) + " Player:" + pl->name + " exit game");
-    
-    running_games.erase(game->id);
-    
-    //reseting players statistics
-    pl->game_id = 0;
-    pl->score = 0;
-    pl->game_indicator = 0;
-    
-    auto *opponent = game->get_opponent(pl);
-    
-    opponent->game_id = 0;
-    opponent->score = 0;
-    opponent->game_indicator = 0;
-    
-    ResponseManager::sendResult(pl, "CLOSE_GAME;0");
-    ResponseManager::sendResult(opponent, "CLOSE_GAME;0");
-    
-    ResponseManager::sendStatus(opponent, "Opponent left game");
-    
-    pl->state = "LOBBY";
-    opponent->state = "LOBBY";
-    
-    delete game;
 }
 
 /**
  *  Handle if player is dosconnected
  */
-void GameManager::disconected_player(int pl_socket)
+void GameManager::disconect_player(int pl_socket)
 {
-    Player* pl = get_logged_player_by_socket(pl_socket);
+
+    Player *pl = get_logged_player_by_socket(pl_socket);
     
-    notifyOpponent(pl, "Opponent is disconnected");
+    if (pl != NULL)
+    {
+        pl->connected = -1;
+        pl->socket = -1;
+        
+        if (pl->state.compare("IN_GAME") == 0)
+        {
+            notifyOpponent(pl, "Opponent is disconnected");
+        }
+        else if (pl->state.compare("RESULT") == 0)
+        {
+            close_game(pl);
+        }
+        
+        LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " has been disconnected");
+        
+    }
     
-    pl->connected = -1;
-    pl->socket = -1;
-    
-    LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " has been disconnected");
+    //if someone is disconnected remove socket
+    Server::closeSocket(pl_socket);
 }
 
 /**
@@ -404,8 +437,6 @@ void GameManager::notifyOpponent(Player *pl, string msg)
  */
 void GameManager::reconnected_player(Player *pl, int new_socket)
 {
-    LogManager::log(__FILENAME__, __FUNCTION__, "Reconnecting player: " + pl->name + " to game: " + to_string(pl->game_id));
-    
     pl->connected = 0;
     pl->socket = new_socket;
     
@@ -413,6 +444,8 @@ void GameManager::reconnected_player(Player *pl, int new_socket)
     
     if (game != NULL)
     {
+        LogManager::log(__FILENAME__, __FUNCTION__, "Reconnecting player: " + pl->name + " to game: " + to_string(pl->game_id));
+        
         pl->state = "IN_GAME";
         
         ResponseManager::sendGameToClient(pl, game);
@@ -427,15 +460,14 @@ void GameManager::reconnected_player(Player *pl, int new_socket)
             ResponseManager::sendStatus(pl, "Opponent is on Turn");
             notifyOpponent(pl, "Your are on Turn");
         }
-        
-        LogManager::log(__FILENAME__, __FUNCTION__, "Reconnecting player: " + pl->name + " to game: " + to_string(pl->game_id) + " SUCCESS");
     }
     //if game is not exists anymore
     else
     {
+        LogManager::log(__FILENAME__, __FUNCTION__, "Reconnecting player: " + pl->name + " to lobby");
+        
         pl->state = "LOBBY";
         
-        LogManager::log(__FILENAME__, __FUNCTION__, "Reconnecting player: " + pl->name + " to game: " + to_string(pl->game_id) + " FAILED. Player moved to lobby");
         ResponseManager::sendToClient(pl, "LOGIN");
     }
 }
@@ -464,25 +496,19 @@ void GameManager::log_player_resolve(int client_socket, string name)
             }
             else
             {
-                if (pl->game_id > 0)
-                {
-                    //reconnect to game
-                    GameManager::reconnected_player(pl, client_socket);
+               
+                GameManager::reconnected_player(pl, client_socket);
                     
-                }
-                else
-                {
-                    //lobby
-                    LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " now listening on new socket: " + to_string(pl->socket) + " and has been moved to lobby");
-                    
-                    ResponseManager::sendToClient(pl, "LOGIN");
-                }
+                LogManager::log(__FILENAME__, __FUNCTION__, "Reconnecting player: " + pl->name + "to state: " + pl->state + " SUCCESS");
+                
             }
         }
         else
         {
             //register new player
             GameManager::log_player(client_socket, name);
+            
+            
         }
     }
     else
@@ -512,7 +538,9 @@ void GameManager::print_games()
  */
 void GameManager::exit(Player* pl)
 {
-    LogManager::log(__FILENAME__, __FUNCTION__, "Closing game for player: " + pl->name);
+    LogManager::log(__FILENAME__, __FUNCTION__, "Closing application for player: " + pl->name);
+    
+    pl->is_exists = false;
     
     int queue_size = static_cast<int>(players_queue.size());
     
@@ -527,9 +555,19 @@ void GameManager::exit(Player* pl)
         GameManager::timeout_game_exit(pl);
     }
     
-    Server::closeSocket(pl->socket);
+    LogManager::log(__FILENAME__, __FUNCTION__, "Closing ping thread for player: " + pl->name);
+    while(pl->is_thread_running)
+    {
+        sleep(2);
+    }
     
-    delete pl;
+    if (pl->socket != -1)
+    {
+        Server::closeSocket(pl->socket);
+    }
+    
+    
+    //delete pl;
 }
 
 /**
@@ -579,6 +617,7 @@ void GameManager::timeout_game_exit(Player *pl)
     opponent->game_id = 0;
     opponent->score = 0;
     opponent->game_indicator = 0;
+    opponent->state = "LOBBY";
     
     LogManager::log(__FILENAME__, __FUNCTION__, "Game ID: " + to_string(game->id) + " sending information to opponent " + opponent->name);
     
@@ -586,6 +625,66 @@ void GameManager::timeout_game_exit(Player *pl)
     ResponseManager::sendStatus(opponent, "Opponent did not return. NOOB");
     
     delete game;
+}
+
+void GameManager::ping_player(Player* pl)
+{
+    
+    int i = 0;
+    while(1)
+    {
+        if (pl->is_exists == false)
+        {
+            break;
+        }
+        
+        sleep(PING_INTERVAL);
+        
+    
+        if (pl->ping_status == true)
+        {
+            i = 0;
+            pl->ping_status = false;
+            
+            if (pl->is_exists == true)
+            {
+                ResponseManager::ping(pl);
+            }
+            else
+            {
+                break;
+            }
+        }
+        else
+        {
+            GameManager::disconect_player(pl->socket);
+            while(1)
+            {
+                i++;
+                if (i == TIMEOUT)
+                {
+                    pl->is_thread_running = false;
+                    
+                    GameManager::exit(pl);
+                    LogManager::log(__FILENAME__, __FUNCTION__, "Ping thread for player:" + pl->name + " has been closed");
+                    pthread_exit(0);
+                }
+                
+                if (pl->connected >= 0)
+                {
+                    pl->ping_status = true;
+                    break;
+                }
+                
+                sleep(1);
+            }
+        }
+    }
+    
+    //for closing thread with button exit game
+    pl->is_thread_running = false;
+    LogManager::log(__FILENAME__, __FUNCTION__, "Ping thread for player:" + pl->name + " has been closed");
+    pthread_exit(0);
 }
 
 

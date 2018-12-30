@@ -124,3 +124,9 @@ void ResponseManager::sendGameToClient(Player *pl, Game *game)
     sendToClient(pl, msg);
     
 }
+
+void ResponseManager::ping(Player* pl)
+{
+    sendToClient(pl,"PING;");
+}
+

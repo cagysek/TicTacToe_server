@@ -21,6 +21,8 @@ Player::Player(char *ip, int socket)
     this->score = 0;
     this->game_indicator = 0;
     this->state = "NEW";
+    this->ping_status = true;
+    this->is_exists = true;
     
     LogManager::log(__FILENAME__, __FUNCTION__, "New player created on socket: " + to_string(socket));
 }

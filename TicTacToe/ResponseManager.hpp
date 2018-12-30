@@ -29,6 +29,7 @@ public:
     static void sendGameToClient(Player* pl, Game* game);
     
     static void sendStatus(Player* pl, string msg);
+    static void ping(Player* pl);
 };
 
 

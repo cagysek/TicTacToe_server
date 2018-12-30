@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <map>
 #include <stack>
+#include <thread>
+#include <unistd.h>
 
 
 #include "Player.hpp"
@@ -40,7 +42,7 @@ class GameManager
         static Game* get_running_game(int id);
         static void rematch(Player* pl);
         static void close_game(Player* pl);
-        static void disconected_player(int pl_socket);
+        static void disconect_player(int pl_socket);
         static void reconnected_player(Player* pl, int new_socket);
         static void print_games();
     
@@ -55,7 +57,9 @@ class GameManager
         static void set_max_games(int max_games);
     
         static void delete_player_from_queue(Player* pl, int n, int curr);
-        static void notifyOpponent(Player* pl, string msg);
+    static void notifyOpponent(Player* pl, string msg);
+    
+    static void ping_player(Player* pl);
     
     private:
         static map<int, Player*> unlogged_players;
