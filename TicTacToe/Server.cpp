@@ -116,16 +116,10 @@ void Server::listenConnections()
     
     LogManager::log(__FILENAME__, __FUNCTION__, "Start listening");
     
-    struct timeval client_timeout;
-    //client_timeout.tv_sec = 180;
-    client_timeout.tv_sec = 0;
-    client_timeout.tv_usec = 100;
-    
-    
     FD_ZERO(&client_socks);
     FD_SET(server_socket, &client_socks);
     
-    int return_value, fd;
+    int fd;
     
     while (1)
     {
@@ -133,7 +127,7 @@ void Server::listenConnections()
         tests = client_socks;
         
         // sada deskriptoru je po kazdem volani select prepsana sadou deskriptoru kde se neco delo
-        return_value = select(FD_SETSIZE, &tests, (fd_set*)NULL, (fd_set*)NULL, &client_timeout);
+        select(FD_SETSIZE, &tests, (fd_set*)NULL, (fd_set*)NULL, (struct timeval*) NULL);
         
         int a2read;
         char cbuf[1024];
@@ -223,6 +217,8 @@ void Server::closeSocket(int socket)
     
     close(socket);
     FD_CLR(socket, &client_socks);
+    
+    LogManager::log(__FILENAME__, __FUNCTION__, "Socket with ID: " + to_string(socket) + " has been closed");
 }
 
 

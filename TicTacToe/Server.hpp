@@ -30,7 +30,7 @@ class Server
         static fd_set client_socks, tests;
     
     private:
-        int server_socket, client_socket, fd;
+        int server_socket, client_socket;
         static struct sockaddr_in server , client, peer_addr;
 };
 
