@@ -27,9 +27,9 @@ class Player
         int connected;
     
         int score;
-    int game_indicator;
+        int game_indicator;
     
-    bool ping_status;
+        bool ping_status;
     
         string name;
         string msg_in;
@@ -37,11 +37,11 @@ class Player
     
         string state;
     
-    bool want_rematch;
+        bool want_rematch;
     
-    thread ping_thread;
-    bool is_thread_running;
-    bool is_exists;
+        thread ping_thread;
+        bool is_thread_running;
+        bool is_exists;
     
         Player(char *ip, int socket);
         ~Player();
