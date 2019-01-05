@@ -479,7 +479,7 @@ void GameManager::log_player_resolve(int client_socket, string name)
 {
     LogManager::log(__FILENAME__, __FUNCTION__, "Log resolve for player on socket: " + to_string(client_socket) + " with name: \"" + name + "\"");
     
-    if (!name.empty())
+    if (!name.empty() && name.length() < 14)
     {
         Player* pl = get_logged_player_by_name(name);
         

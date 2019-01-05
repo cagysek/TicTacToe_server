@@ -28,6 +28,9 @@
 fd_set Server::client_socks, Server::tests;
 struct sockaddr_in Server::peer_addr, Server::client, Server::server;
 
+int MAX_INVALID_MESSAGES = 5;
+int MAX_MESSAGE_LENGHT = 30;
+
 /**
  * Server initilization
  */
@@ -170,18 +173,34 @@ void Server::listenConnections()
                         memset(cbuf, 0, 1024);
                         
                         recv(pl->socket , &cbuf , 1024 , 0);
-
+                        
                         string msg(cbuf);
                         
-                        RequestManager::resolve(pl, msg);
+                        if (msg.length() < MAX_MESSAGE_LENGHT)
+                        {
+                            RequestManager::resolve(pl, msg);
+                        }
+                        else
+                        {
+                            pl->invalid_message_counter++;
+                            
+                            LogManager::log(__FILENAME__, __FUNCTION__, "Input message from player: " + pl->name + " socket: " + to_string(pl->socket) + " out of range. Invalid message counter: " + to_string(pl->invalid_message_counter));
+                        }
                         
                         msg.clear();
+                        
+                        if (pl->invalid_message_counter >= MAX_INVALID_MESSAGES)
+                        {
+                            LogManager::log(__FILENAME__, __FUNCTION__, "Maximum invalid messages reached. Player: " + pl->name + " socket: " + to_string(pl->socket));
+                            
+                            closeSocket(pl->socket);
+                        }
                         
                     }
                     // if gui is closed by ctrl+c
                     else if (a2read == 0)
                     {
-                        disconnect(fd);
+                        closeSocket(fd);
                     }
                    
                     else // na socketu se stalo neco spatneho
@@ -197,7 +216,7 @@ void Server::listenConnections()
         }
     }
 }
-
+/*
 void Server::disconnect(int socket)
 {
     Player *pl = GameManager::get_logged_player_by_socket(socket);
@@ -207,6 +226,7 @@ void Server::disconnect(int socket)
         closeSocket(socket);
     }
 }
+ */
 
 /**
  * Method to close specific socket

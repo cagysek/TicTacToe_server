@@ -29,6 +29,8 @@ class Player
         int score;
         int game_indicator;
     
+        int invalid_message_counter;
+    
         bool ping_status;
     
         string name;

@@ -23,6 +23,7 @@ Player::Player(char *ip, int socket)
     this->state = "NEW";
     this->ping_status = true;
     this->is_exists = true;
+    this->invalid_message_counter = 0;
     
     LogManager::log(__FILENAME__, __FUNCTION__, "New player created on socket: " + to_string(socket));
 }

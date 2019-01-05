@@ -14,24 +14,26 @@
  */
 void RequestManager::resolve(Player *pl, std::string msg)
 {
-    LogManager::log(__FILENAME__, __FUNCTION__, "Recv from " + pl->name + " message: " + msg.data());
-    
     pl->msg_in = msg;
     
     vector<string> msg_parts = Utils::split(msg, ";");
     
     if(msg_parts.empty())
     {
-        LogManager::log(__FILENAME__, __FUNCTION__, "Invalid message from player:" + pl->name + " socket:" + to_string(pl->socket));
+        pl->invalid_message_counter++;
+        
+        LogManager::log(__FILENAME__, __FUNCTION__, "Invalid message to resolve. Player:" + pl->name + " socket:" + to_string(pl->socket) + ". Invalid message counter: " + to_string(pl->invalid_message_counter));
     }
     else
     {
         //type of message
         string type = msg_parts[0];
-        LogManager::log(__FILENAME__, __FUNCTION__, "Resolving message type:" + type);
+        LogManager::log(__FILENAME__, __FUNCTION__, "Resolving message:" + msg);
         
         if ( type.compare("NAME") == 0 )
         {
+            pl->invalid_message_counter = 0;
+            
             if (pl->state.compare("NEW") == 0)
             {
                 string name = "";
@@ -50,6 +52,8 @@ void RequestManager::resolve(Player *pl, std::string msg)
         }
         else if ( type.compare("FIND_GAME") == 0 )
         {
+            pl->invalid_message_counter = 0;
+            
             if (pl->state.compare("LOBBY") == 0)
             {
                 GameManager::want_play(pl);
@@ -61,6 +65,8 @@ void RequestManager::resolve(Player *pl, std::string msg)
         }
         else if ( type.compare("TURN") == 0 )
         {
+            pl->invalid_message_counter = 0;
+            
             if (pl->state.compare("IN_GAME") == 0)
             {
                 try {
@@ -80,6 +86,8 @@ void RequestManager::resolve(Player *pl, std::string msg)
         }
         else if ( type.compare("REMATCH") == 0 )
         {
+            pl->invalid_message_counter = 0;
+            
             if (pl->state.compare("RESULT") == 0)
             {
                 GameManager::rematch(pl);
@@ -91,6 +99,8 @@ void RequestManager::resolve(Player *pl, std::string msg)
         }
         else if ( type.compare("CLOSE_GAME") == 0 )
         {
+            pl->invalid_message_counter = 0;
+            
             if (pl->state.compare("RESULT") == 0)
             {
                 GameManager::close_game(pl);
@@ -103,6 +113,8 @@ void RequestManager::resolve(Player *pl, std::string msg)
         }
         else if ( type.compare("EXIT") == 0)
         {
+            pl->invalid_message_counter = 0;
+            
             if (pl->state.compare("LOBBY") == 0 || pl->state.compare("WAITING") == 0)
             {
                 GameManager::exit(pl);
@@ -115,11 +127,15 @@ void RequestManager::resolve(Player *pl, std::string msg)
         }
         else if (type.compare("ACK") == 0)
         {
+            //ack dont reset invalid_message_counter
+            
             pl->ping_status = true;
         }
         else
         {
-            LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " unknown message type recieved. Type:" + type);
+            pl->invalid_message_counter++;
+            
+            LogManager::log(__FILENAME__, __FUNCTION__, "Player: " + pl->name + " unknown message type recieved. Type:" + type + ". Invalie message counter: " + to_string(pl->invalid_message_counter));
         }
     }
 }
