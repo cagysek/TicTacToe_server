@@ -29,7 +29,7 @@ fd_set Server::client_socks, Server::tests;
 struct sockaddr_in Server::peer_addr, Server::client, Server::server;
 
 int MAX_INVALID_MESSAGES = 5;
-int MAX_MESSAGE_LENGHT = 30;
+
 
 /**
  * Server initilization
@@ -176,21 +176,7 @@ void Server::listenConnections()
                         
                         string msg(cbuf);
                         
-                        cout << msg << endl;
-                        
                         RequestManager::resolveInput(pl, msg);
-                        
-                        if (msg.length() < MAX_MESSAGE_LENGHT)
-                        {
-                            //RequestManager::resolve(pl, msg);
-                           // RequestManager::resolveInput(pl, msg);
-                        }
-                        else
-                        {
-                            pl->invalid_message_counter++;
-                            
-                            LogManager::log(__FILENAME__, __FUNCTION__, "Input message from player: " + pl->name + " socket: " + to_string(pl->socket) + " out of range. Invalid message counter: " + to_string(pl->invalid_message_counter));
-                        }
                         
                         msg.clear();
                         
@@ -198,25 +184,14 @@ void Server::listenConnections()
                         {
                             LogManager::log(__FILENAME__, __FUNCTION__, "Maximum invalid messages reached. Player: " + pl->name + " socket: " + to_string(pl->socket));
                             
-                            closeSocket(pl->socket);
+                            disconnect(fd);
                         }
                         
                     }
                     // if gui is closed by ctrl+c
                     else if (a2read == 0)
                     {
-                        Player *pl = GameManager::get_logged_player_by_socket(fd);
-                        
-                        if (pl == NULL)
-                        {
-                            pl = GameManager::get_unlogged_player(fd);
-                        }
-                        
-                        pl->socket = -1;
-                        pl->ping_status = false;
-                        GameManager::disconect_player(pl->socket);
-                        
-                        closeSocket(fd);
+                        disconnect(fd);
                         
                         LogManager::log(__FILENAME__, __FUNCTION__, "Something bad happened on client");
                     }
@@ -234,17 +209,30 @@ void Server::listenConnections()
         }
     }
 }
-/*
+
 void Server::disconnect(int socket)
 {
     Player *pl = GameManager::get_logged_player_by_socket(socket);
     
     if (pl == NULL)
     {
-        closeSocket(socket);
+        pl = GameManager::get_unlogged_player(socket);
     }
+    
+    pl->socket = -1;
+    pl->ping_status = false;
+    GameManager::disconect_player(pl->socket);
+    
+    closeSocket(socket);
+    
+    if (pl->state.compare("NEW") == 0)
+    {
+        GameManager::unlogged_players.erase(socket);
+    }
+    
+
 }
- */
+ 
 
 /**
  * Method to close specific socket

@@ -60,10 +60,11 @@ class GameManager
     static void notifyOpponent(Player* pl, string msg);
     
     static void ping_player(Player* pl);
+    static map<int, Player*> unlogged_players;
+    static map<string, Player*> logged_players;
     
     private:
-        static map<int, Player*> unlogged_players;
-        static map<string, Player*> logged_players;
+    
     
         static map<int, Game*> running_games;
         static stack<Player*> players_queue;

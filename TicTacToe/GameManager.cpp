@@ -134,6 +134,8 @@ void GameManager::want_play(Player* pl)
             LogManager::log(__FILENAME__, __FUNCTION__, "Opponent not found. Player: " + pl->name + " has beed added to queue");
             
             players_queue.push(pl);
+            
+            
             ResponseManager::sendState(pl, "WAITING;0");
             
             pl->state = "WAITING";

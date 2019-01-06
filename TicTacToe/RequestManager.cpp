@@ -8,6 +8,7 @@
 
 #include "RequestManager.hpp"
 
+int MAX_MESSAGE_LENGHT = 30;
 
 /**
  *  Resolve incoming message
@@ -139,9 +140,13 @@ void RequestManager::resolve(Player *pl, std::string msg)
     }
 }
 
+/**
+ *  Remove duplicate messages
+ */
 void RequestManager::resolveInput(Player *pl, std::string msg)
 {
     vector<string> msg_parts = Utils::split(msg, "|");
+    
     vector<string> used_parts;
     bool is_used = false;
     
@@ -162,9 +167,19 @@ void RequestManager::resolveInput(Player *pl, std::string msg)
         
         if(!is_used)
         {
-            cout << msg_parts[i] << endl;
             used_parts.insert(used_parts.begin(), msg_parts[i]);
-            RequestManager::resolve(pl, msg_parts[i]);
+            
+            if (msg.length() < MAX_MESSAGE_LENGHT)
+            {
+                RequestManager::resolve(pl, msg_parts[i]);
+            }
+            else
+            {
+                pl->invalid_message_counter++;
+                
+                LogManager::log(__FILENAME__, __FUNCTION__, "Input message from player: " + pl->name + " socket: " + to_string(pl->socket) + ". Error: Message out of range. Invalid message counter: " + to_string(pl->invalid_message_counter));
+            }
+            
         }
     }
 }
