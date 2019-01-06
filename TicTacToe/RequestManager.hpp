@@ -20,7 +20,8 @@
 class RequestManager
 {
     public:
-        static void resolve(Player *pl, std::string msg);
+    static void resolve(Player *pl, std::string msg);
+    static void resolveInput(Player *pl, std::string msg);
 
 };
 

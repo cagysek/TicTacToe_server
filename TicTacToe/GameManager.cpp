@@ -18,7 +18,7 @@ int GameManager::game_id_generator = 1;
 int GameManager::MAX_GAMES;
 
 int TIMEOUT = 180;
-int PING_INTERVAL = 5;
+int PING_INTERVAL = 1;
 
 /**
  *  Method to create unloged player
@@ -396,7 +396,7 @@ void GameManager::disconect_player(int pl_socket)
     if (pl != NULL)
     {
         pl->connected = -1;
-        pl->socket = -1;
+        //pl->socket = -1;
         
         if (pl->state.compare("IN_GAME") == 0)
         {
@@ -412,7 +412,7 @@ void GameManager::disconect_player(int pl_socket)
     }
     
     //if someone is disconnected remove socket
-    Server::closeSocket(pl_socket);
+    //Server::closeSocket(pl_socket);
 }
 
 /**
@@ -439,6 +439,7 @@ void GameManager::reconnected_player(Player *pl, int new_socket)
 {
     pl->connected = 0;
     pl->socket = new_socket;
+    pl->ping_status = true;
     
     Game *game = get_running_game(pl->game_id);
     
@@ -638,14 +639,8 @@ void GameManager::ping_player(Player* pl)
             break;
         }
         
-        sleep(PING_INTERVAL);
-        
-    
-        if (pl->ping_status == true)
+        if (pl->socket > 0)
         {
-            i = 0;
-            pl->ping_status = false;
-            
             if (pl->is_exists == true)
             {
                 ResponseManager::ping(pl);
@@ -655,29 +650,66 @@ void GameManager::ping_player(Player* pl)
                 break;
             }
         }
+        
+        sleep(PING_INTERVAL);
+        
+        if (pl->ping_status == true)
+        {
+            if (pl->connected < 0)
+            {
+                pl->ping_status = true;
+                LogManager::log(__FILENAME__, __FUNCTION__, "Player:" + pl->name + " has been reconnected");
+                
+                Game *game = get_running_game(pl->game_id);
+                
+                if (game != NULL)
+                {
+                    LogManager::log(__FILENAME__, __FUNCTION__, "Reconnecting player: " + pl->name + " to game: " + to_string(pl->game_id));
+                    
+                    pl->state = "IN_GAME";
+                    
+                    ResponseManager::sendGameToClient(pl, game);
+                    
+                    if (game->gameLogic->turn_indicator == pl->game_indicator)
+                    {
+                        ResponseManager::sendStatus(pl, "You are on Turn");
+                        notifyOpponent(pl, "Opponent is on Turn");
+                    }
+                    else
+                    {
+                        ResponseManager::sendStatus(pl, "Opponent is on Turn");
+                        notifyOpponent(pl, "Your are on Turn");
+                    }
+                }
+                else
+                {
+                    ResponseManager::sendStatus(pl, "Reconnected");
+                }
+            }
+            
+            
+            i = 0;
+            pl->ping_status = false;
+            pl->connected = 0;
+        }
         else
         {
-            GameManager::disconect_player(pl->socket);
-            while(1)
+            if (pl->connected >= 0)
             {
-                i++;
-                if (i == TIMEOUT)
-                {
-                    pl->is_thread_running = false;
-                    
-                    GameManager::exit(pl);
-                    LogManager::log(__FILENAME__, __FUNCTION__, "Ping thread for player:" + pl->name + " has been closed");
-                    pthread_exit(0);
-                }
-                
-                if (pl->connected >= 0)
-                {
-                    pl->ping_status = true;
-                    break;
-                }
-                
-                sleep(1);
+                GameManager::disconect_player(pl->socket);
             }
+                
+            i = i + PING_INTERVAL;
+            if (i == TIMEOUT)
+            {
+                pl->is_thread_running = false;
+                
+                GameManager::exit(pl);
+                LogManager::log(__FILENAME__, __FUNCTION__, "Ping thread for player:" + pl->name + " has been closed");
+                pthread_exit(0);
+                
+            }
+            
         }
     }
     

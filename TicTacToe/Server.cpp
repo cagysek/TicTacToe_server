@@ -84,7 +84,7 @@ int Server::setUp(Configuration *config)
 
     server.sin_port = htons(config->port);
  
-//   server.sin_addr.s_addr = INADDR_ANY;
+   //server.sin_addr.s_addr = INADDR_ANY;
   //  server.sin_port = htons(10000);
     
     //Bind
@@ -176,9 +176,14 @@ void Server::listenConnections()
                         
                         string msg(cbuf);
                         
+                        cout << msg << endl;
+                        
+                        RequestManager::resolveInput(pl, msg);
+                        
                         if (msg.length() < MAX_MESSAGE_LENGHT)
                         {
-                            RequestManager::resolve(pl, msg);
+                            //RequestManager::resolve(pl, msg);
+                           // RequestManager::resolveInput(pl, msg);
                         }
                         else
                         {
@@ -200,7 +205,20 @@ void Server::listenConnections()
                     // if gui is closed by ctrl+c
                     else if (a2read == 0)
                     {
+                        Player *pl = GameManager::get_logged_player_by_socket(fd);
+                        
+                        if (pl == NULL)
+                        {
+                            pl = GameManager::get_unlogged_player(fd);
+                        }
+                        
+                        pl->socket = -1;
+                        pl->ping_status = false;
+                        GameManager::disconect_player(pl->socket);
+                        
                         closeSocket(fd);
+                        
+                        LogManager::log(__FILENAME__, __FUNCTION__, "Something bad happened on client");
                     }
                    
                     else // na socketu se stalo neco spatneho
