@@ -17,7 +17,7 @@ void ResponseManager::sendToClient(Player *pl, string msg)
     
     LogManager::log(__FILENAME__, __FUNCTION__, "Message: " + msg + " is sending to player " + pl->name + " socket: " + to_string(pl->socket));
     
-    msg = msg += "\n";
+    msg += "\n";
     
     send(pl->socket, msg.data(), msg.length(), 0);
     

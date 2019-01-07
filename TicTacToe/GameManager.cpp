@@ -194,6 +194,7 @@ void GameManager::create_game(Player* pl1, Player *pl2)
     LogManager::log(__FILENAME__, __FUNCTION__, "Creating new game for players " + pl1->name + " and " + pl2->name);
     
     auto *game = new Game(game_id_generator, pl1, pl2);
+    game->gameLogic->last_winner = pl1;
     
     running_games.insert(make_pair(game_id_generator, game));
     
