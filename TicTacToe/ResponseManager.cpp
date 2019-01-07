@@ -53,7 +53,7 @@ void ResponseManager::sendStatus(Player *pl, string msg)
 {
     LogManager::log(__FILENAME__, __FUNCTION__, "Preparing message for player " + pl->name);
     
-    string temp = "STATUS;" + msg;
+    string temp = "STATUS;" + msg + ";";
     ResponseManager::sendToClient(pl, temp);
 }
 
